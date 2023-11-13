@@ -1,3 +1,4 @@
+import { AppBar } from "@/components/app-bar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";

@@ -1,0 +1,19 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Cluster {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    name      String   @db.VarChar(255)
+    host      String
+    port      String
+    username  String
+    password  String
+    type      String
+}
