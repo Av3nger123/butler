@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DatabaseCards } from "./database-cards";
 
 export default function Home() {
-	const { data: clusters, refetch } = useQuery({
+	const { data, refetch } = useQuery({
 		queryKey: ["clusters"],
 		queryFn: async () => {
 			return await fetch("/api/clusters").then(async (res) => {
@@ -24,7 +24,6 @@ export default function Home() {
 			});
 		},
 	});
-
 	return (
 		<main className="flex flex-col items-center justify-between p-10">
 			<div className="container mx-auto p-4">
@@ -49,7 +48,7 @@ export default function Home() {
 						</DialogContent>
 					</Dialog>
 				</div>
-				<DatabaseCards clusters={clusters?.data} refetch={refetch} />
+				<DatabaseCards clusters={data?.clusters} refetch={refetch} />
 			</div>
 		</main>
 	);

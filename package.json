@@ -48,6 +48,7 @@
 		"@uiw/react-textarea-code-editor": "^2.1.9",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.0.0",
+		"crypto": "^1.0.1",
 		"crypto-js": "^4.2.0",
 		"lucide-react": "^0.292.0",
 		"next": "14.0.1",

@@ -82,7 +82,6 @@ export function DatabaseForm({
 			request["id"] = databaseCluster?.id;
 		}
 		request["password"] = encrypt(values.password);
-		console.log(request);
 		const response = await fetch("/api/clusters", {
 			method: "POST",
 			headers: {
