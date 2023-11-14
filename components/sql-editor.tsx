@@ -8,12 +8,12 @@ export function SQLEditor({ code, setCode }: { code: string; setCode: any }) {
 	const { theme } = useTheme();
 
 	return (
-		<div className="container mt-8 mx-auto">
+		<div className="container mx-auto">
 			<div className="rounded-md  border shadow-md h-96 w-full">
 				<CodeEditor
 					value={code}
 					language="sql"
-					placeholder=""
+					placeholder="...notepad"
 					onChange={(evn) => setCode(evn.target.value)}
 					padding={15}
 					style={{

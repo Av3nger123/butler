@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { SidebarNavItem } from "@/types/index";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { useEffect, useRef, useState } from "react";
+import { ChevronsLeftRightIcon } from "lucide-react";
 
 export interface SidebarNavProps {
 	items: SidebarNavItem[];
@@ -13,33 +15,60 @@ export interface SidebarNavProps {
 }
 
 export function SidebarNav({ items, type }: SidebarNavProps) {
+	const [width, setWidth] = useState<number>(200);
+	const isResized = useRef(false);
 	const path = usePathname();
 	const pathname = usePathname();
 
+	useEffect(() => {
+		window.addEventListener("mousemove", (e) => {
+			if (!isResized.current) {
+				return;
+			}
+
+			setWidth((previousWidth) => previousWidth + e.movementX / 2);
+		});
+
+		window.addEventListener("mouseup", () => {
+			isResized.current = false;
+		});
+	}, []);
+
 	return items?.length ? (
-		<div className="p-2 border-r w-fit h-full flex flex-col">
-			{items.map((item, index) => (
-				<Button key={index} variant="ghost" asChild>
-					<Link href={path + "/" + type + `/${item.name}`}>
-						<div className={cn("pb-1")}>
-							<h4
-								className={cn(
-									"flex w-full items-center rounded-md p-2 hover:underline",
-									{
+		<div className="flex">
+			<div
+				className="p-2 border-r border-double  w-fit h-full flex flex-col overflow-hidden"
+				style={{ width: `${width / 16}rem` }}
+			>
+				{items.map((item, index) => (
+					<Button key={index} variant="ghost" asChild>
+						<Link
+							href={path + "/" + type + `/${item.name}`}
+							className="flex items-start"
+						>
+							<div className={cn("pb-1")}>
+								<h4
+									className={cn("flex w-full rounded-md p-2 hover:underline", {
 										"bg-muted":
 											pathname === path + "/" + type + `/${item.name}`,
-									}
-								)}
-							>
-								{item.name}
-							</h4>
-							{/* {item.items ? (
+									})}
+								>
+									{item.name}
+								</h4>
+								{/* {item.items ? (
 						<DocsSidebarNavItems items={item.items} pathname={pathname} />
 					) : null} */}
-						</div>
-					</Link>
-				</Button>
-			))}
+							</div>
+						</Link>
+					</Button>
+				))}
+			</div>
+			<div
+				onMouseDown={() => {
+					isResized.current = true;
+				}}
+				className="w-1 cursor-col-resize select-none"
+			/>
 		</div>
 	) : null;
 }

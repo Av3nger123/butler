@@ -14,14 +14,13 @@ import {
 import { DatabaseForm } from "@/components/database-form";
 import { useQuery } from "@tanstack/react-query";
 import { DatabaseCards } from "./database-cards";
+import { getApi } from "@/lib/api";
 
 export default function Home() {
 	const { data, refetch } = useQuery({
 		queryKey: ["clusters"],
 		queryFn: async () => {
-			return await fetch("/api/clusters").then(async (res) => {
-				return await res.json();
-			});
+			return await getApi("/api/clusters");
 		},
 	});
 	return (

@@ -3,11 +3,10 @@ import { SidebarNav } from "@/components/side-nav";
 import { decrypt, encrypt } from "@/lib/utils";
 import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import {
-	ClusterContextProvider,
-	useClusterContext,
-} from "@/components/context/cluster-context";
 import { useMemo } from "react";
+import { postApi } from "@/lib/api";
+import useClusterStore from "@/lib/store/clusterstore";
+import { BarLoader } from "react-spinners";
 
 export default function ClusterPage({
 	params,
@@ -16,25 +15,25 @@ export default function ClusterPage({
 		clusterId: string;
 	};
 }>) {
-	const { myState } = useClusterContext();
+	const { cluster } = useClusterStore();
 
-	const { data: clusterDatabases, refetch } = useQuery({
+	const {
+		data: clusterDatabases,
+		refetch,
+		isLoading,
+	} = useQuery({
 		queryKey: ["databases", params.clusterId],
 		queryFn: async () => {
-			return await fetch("http://localhost:8080/databases", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					...myState,
-					password: decrypt(myState.password),
-				}),
-			}).then(async (res) => {
-				return await res.json();
-			});
+			if (cluster)
+				return await postApi(
+					"http://localhost:8080/databases",
+					JSON.stringify({
+						...cluster,
+						password: decrypt(cluster.password),
+					})
+				);
 		},
-		enabled: !!myState,
+		enabled: !!cluster,
 	});
 
 	const databases = useMemo(() => {
@@ -47,7 +46,7 @@ export default function ClusterPage({
 	}, [clusterDatabases]);
 
 	return (
-		<div className="h-full">
+		<div className="h-full w-full">
 			<SidebarNav type="database" items={databases} />
 		</div>
 	);

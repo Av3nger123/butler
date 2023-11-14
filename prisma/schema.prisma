@@ -17,3 +17,13 @@ model Cluster {
     password  String
     type      String
 }
+
+model Query {
+    id         Int      @id @default(autoincrement())
+    createdAt  DateTime @default(now())
+    exectedAt  DateTime
+    clusterId  String
+    databaseId String
+    tableId    String
+    sqlQuery   String
+}

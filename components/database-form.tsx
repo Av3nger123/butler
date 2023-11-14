@@ -26,6 +26,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { decrypt, encrypt } from "@/lib/utils";
+import { postApi } from "@/lib/api";
 
 const databaseSchema = z.object({
 	name: z.string().min(2, {
@@ -82,13 +83,7 @@ export function DatabaseForm({
 			request["id"] = databaseCluster?.id;
 		}
 		request["password"] = encrypt(values.password);
-		const response = await fetch("/api/clusters", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(request),
-		});
+		const response = await postApi("/api/clusters", JSON.stringify(request));
 		refetch();
 	}
 	return (

@@ -1,10 +1,12 @@
 "use client";
 
-import { useClusterContext } from "@/components/context/cluster-context";
+import { Queries } from "@/components/queries";
 import { SidebarNav } from "@/components/side-nav";
+import { getApi, postApi } from "@/lib/api";
 import { tables } from "@/lib/placeholder";
+import useClusterStore from "@/lib/store/clusterstore";
 import { decrypt } from "@/lib/utils";
-import { SidebarNavItem } from "@/types";
+import { SidebarNavItem, Database } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -16,26 +18,34 @@ export default function Page({
 		clusterId: string;
 	};
 }) {
-	const { myState } = useClusterContext();
-
-	const { data: databaseTables, refetch } = useQuery({
+	const { cluster } = useClusterStore();
+	const {
+		data: databaseTables,
+		refetch,
+		isLoading,
+	} = useQuery({
 		queryKey: ["tables", params.clusterId, params.databaseId],
 		queryFn: async () => {
-			return await fetch("http://localhost:8080/tables", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					...myState,
-					password: decrypt(myState.password),
-					dbname: params.databaseId,
-				}),
-			}).then(async (res) => {
-				return await res.json();
-			});
+			if (cluster)
+				return await postApi(
+					"http://localhost:8080/tables",
+					JSON.stringify({
+						...cluster,
+						password: decrypt(cluster.password),
+						dbname: params.databaseId,
+					})
+				);
 		},
-		enabled: !!myState,
+		enabled: !!cluster,
+	});
+	const { data } = useQuery({
+		queryKey: ["queries", params.clusterId, params.databaseId],
+		queryFn: async () => {
+			return await getApi(
+				`/api/clusters/${params.clusterId}/queries?databaseId=${params.databaseId}`
+			);
+		},
+		enabled: !!cluster,
 	});
 
 	const tables = useMemo(() => {
@@ -46,14 +56,18 @@ export default function Page({
 		});
 		return tables;
 	}, [databaseTables]);
+
 	return (
-		<div className="h-full">
-			<SidebarNav
-				type="table"
-				items={tables?.map((element: SidebarNavItem) => ({
-					name: element.name,
-				}))}
-			/>
+		<div className="h-full w-full">
+			<div className="flex flex-row">
+				<SidebarNav
+					type="table"
+					items={tables?.map((element: SidebarNavItem) => ({
+						name: element.name,
+					}))}
+				/>
+				<Queries queries={data?.queries} />
+			</div>
 		</div>
 	);
 }

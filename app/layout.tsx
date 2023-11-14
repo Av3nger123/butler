@@ -1,4 +1,3 @@
-import { AppBar } from "@/components/app-bar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
@@ -22,6 +21,7 @@ export default function RootLayout({
 					"min-h-screen bg-background font-sans antialiased",
 					fontSans.variable
 				)}
+				suppressHydrationWarning
 			>
 				<ThemeProvider
 					attribute="class"

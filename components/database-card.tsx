@@ -48,7 +48,8 @@ import { DatabaseForm } from "./database-form";
 import Link from "next/link";
 import { Database } from "@/types";
 import { Skeleton } from "./ui/skeleton";
-import { useClusterContext } from "./context/cluster-context";
+import { deleteApi } from "@/lib/api";
+import useClusterStore from "@/lib/store/clusterstore";
 
 interface DatabaseCardProps {
 	databaseCluster: Database;
@@ -66,16 +67,14 @@ export function DatabaseCard({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseCardProps>) {
-	const { setMyState } = useClusterContext();
+	const { cluster, setCluster } = useClusterStore();
 	async function handleDelete() {
-		await fetch(`/api/clusters/${databaseCluster.id}`, {
-			method: "DELETE",
-		});
+		await deleteApi(`/api/clusters/${databaseCluster.id}`);
 		refetch();
 	}
 
 	async function handleClusterCLick() {
-		setMyState(databaseCluster);
+		setCluster(databaseCluster);
 	}
 	return (
 		<Card>
