@@ -8,8 +8,18 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
 	const requestBody = await request.json();
-	const cluster = await prisma.cluster.create({
-		data: requestBody,
-	});
-	return Response.json({ cluster });
+	if (requestBody?.id) {
+		const cluster = await prisma.cluster.update({
+			where: {
+				id: parseInt(requestBody?.id),
+			},
+			data: requestBody,
+		});
+		return Response.json({ cluster });
+	} else {
+		const cluster = await prisma.cluster.create({
+			data: requestBody,
+		});
+		return Response.json({ cluster });
+	}
 }

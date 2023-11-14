@@ -26,7 +26,8 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 								className={cn(
 									"flex w-full items-center rounded-md p-2 hover:underline",
 									{
-										"bg-muted": pathname === item.link,
+										"bg-muted":
+											pathname === path + "/" + type + `/${item.name}`,
 									}
 								)}
 							>

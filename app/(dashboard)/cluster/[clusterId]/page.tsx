@@ -1,29 +1,24 @@
 "use client";
 import { SidebarNav } from "@/components/side-nav";
-import { databaseClusters, databases } from "@/lib/placeholder";
-import { encrypt } from "@/lib/utils";
+import { decrypt, encrypt } from "@/lib/utils";
 import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
+import {
+	ClusterContextProvider,
+	useClusterContext,
+} from "@/components/context/cluster-context";
+import { useMemo } from "react";
 
 export default function ClusterPage({
 	params,
-}: {
+}: Readonly<{
 	params: {
 		clusterId: string;
 	};
-}) {
-	const { data: cluster } = useQuery({
-		queryKey: ["cluster", params.clusterId],
-		queryFn: async () => {
-			return await fetch("/api/clusters/" + params.clusterId).then(
-				async (res) => {
-					return await res.json();
-				}
-			);
-		},
-	});
+}>) {
+	const { myState } = useClusterContext();
 
-	const { data: databases, refetch } = useQuery({
+	const { data: clusterDatabases, refetch } = useQuery({
 		queryKey: ["databases", params.clusterId],
 		queryFn: async () => {
 			return await fetch("http://localhost:8080/databases", {
@@ -32,22 +27,28 @@ export default function ClusterPage({
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					encrypted_payload: encrypt(JSON.stringify(cluster.data[0])),
+					...myState,
+					password: decrypt(myState.password),
 				}),
+			}).then(async (res) => {
+				return await res.json();
 			});
 		},
-		enabled: !!cluster,
+		enabled: !!myState,
 	});
+
+	const databases = useMemo(() => {
+		let databases: SidebarNavItem[] = [];
+
+		clusterDatabases?.databases.forEach((database: string) => {
+			databases.push({ name: database });
+		});
+		return databases;
+	}, [clusterDatabases]);
 
 	return (
 		<div className="h-full">
-			{/* <SidebarNav
-				type="database"
-				items={databases[params.clusterId].map((element: SidebarNavItem) => ({
-					name: element.name,
-					link: element.link,
-				}))}
-			/> */}
+			<SidebarNav type="database" items={databases} />
 		</div>
 	);
 }

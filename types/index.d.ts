@@ -10,5 +10,4 @@ type Database = {
 
 export type SidebarNavItem = {
 	name: string;
-	link: string;
 };

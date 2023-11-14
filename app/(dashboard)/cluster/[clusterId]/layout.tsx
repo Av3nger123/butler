@@ -1,7 +1,4 @@
 import Breadcrumbs from "@/components/breadcrumbs";
-import { SidebarNav } from "@/components/side-nav";
-import { Separator } from "@/components/ui/separator";
-import { databases } from "@/lib/placeholder";
 
 export default function Layout({
 	children,

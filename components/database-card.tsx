@@ -48,6 +48,7 @@ import { DatabaseForm } from "./database-form";
 import Link from "next/link";
 import { Database } from "@/types";
 import { Skeleton } from "./ui/skeleton";
+import { useClusterContext } from "./context/cluster-context";
 
 interface DatabaseCardProps {
 	databaseCluster: Database;
@@ -65,12 +66,26 @@ export function DatabaseCard({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseCardProps>) {
+	const { setMyState } = useClusterContext();
+	async function handleDelete() {
+		await fetch(`/api/clusters/${databaseCluster.id}`, {
+			method: "DELETE",
+		});
+		refetch();
+	}
+
+	async function handleClusterCLick() {
+		setMyState(databaseCluster);
+	}
 	return (
 		<Card>
 			<CardHeader className="grid grid-cols-[1fr_110px] items-start gap-1 space-y-0">
 				<div className="space-y-1">
 					<CardTitle>
-						<Link href={`/cluster/${databaseCluster.id}`}>
+						<Link
+							href={`/cluster/${databaseCluster.id}`}
+							onClick={handleClusterCLick}
+						>
 							{databaseCluster.name}
 						</Link>
 					</CardTitle>
@@ -113,7 +128,9 @@ export function DatabaseCard({
 							</AlertDialogHeader>
 							<AlertDialogFooter>
 								<AlertDialogCancel>Cancel</AlertDialogCancel>
-								<AlertDialogAction>Continue</AlertDialogAction>
+								<AlertDialogAction onClick={handleDelete}>
+									Continue
+								</AlertDialogAction>
 							</AlertDialogFooter>
 						</AlertDialogContent>
 					</AlertDialog>

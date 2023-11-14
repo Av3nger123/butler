@@ -10,6 +10,7 @@ import {
 	QueryClient,
 	QueryClientProvider,
 } from "@tanstack/react-query";
+import { ClusterContextProvider } from "./context/cluster-context";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,11 @@ export function ThemeProvider({
 }: Readonly<ThemeProviderProps>) {
 	return (
 		<NextThemesProvider {...props}>
-			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+			<ClusterContextProvider>
+				<QueryClientProvider client={queryClient}>
+					{children}
+				</QueryClientProvider>
+			</ClusterContextProvider>
 		</NextThemesProvider>
 	);
 }

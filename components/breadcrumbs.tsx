@@ -4,6 +4,7 @@ import { Boxes, ChevronsRight, Database, Dot, Table2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
+import { useClusterContext } from "./context/cluster-context";
 
 const breadIcons: any = {
 	cluster: <Boxes size={20} />,
@@ -12,6 +13,7 @@ const breadIcons: any = {
 };
 
 const Breadcrumbs: React.FC = () => {
+	const { myState } = useClusterContext();
 	const pathname = usePathname();
 	const pathSegments = pathname.split("/").filter((segment) => segment !== "");
 
@@ -30,7 +32,9 @@ const Breadcrumbs: React.FC = () => {
 								<Button variant="ghost" asChild>
 									<Link href={`/${pathSegments.slice(0, index + 1).join("/")}`}>
 										{breadIcons[pathSegments[index - 1]]}&nbsp;
-										{segment}
+										{pathSegments[index - 1] === "cluster"
+											? myState["name"]
+											: segment}
 									</Link>
 								</Button>
 							</li>
