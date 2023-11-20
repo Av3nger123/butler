@@ -28,6 +28,43 @@ model Query {
     sqlQuery   String
 }
 
+model Workspaces {
+    id        Int      @id @default(autoincrement())
+    name      String   @db.VarChar(255)
+    createdAt DateTime @default(now())
+
+    @@map("workspaces")
+}
+
+model Roles {
+    id        String   @id @db.VarChar(255)
+    createdAt DateTime @default(now())
+
+    @@map("roles")
+}
+
+model RolePermissions {
+    roleId       String @map("role_id")
+    permissionId String @map("permission_id")
+
+    @@unique([roleId, permissionId])
+}
+
+model Permissions {
+    id        String   @id @db.VarChar(255)
+    createdAt DateTime @default(now())
+
+    @@map("permissions")
+}
+
+model UserRoles {
+    userId      String @map("user_id")
+    roleId      String @map("role_id")
+    workspaceId String @map("workspace_id")
+
+    @@unique([userId, roleId, workspaceId])
+}
+
 // Auth models
 model Account {
     id                String  @id @default(cuid())

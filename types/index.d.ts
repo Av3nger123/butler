@@ -11,3 +11,11 @@ type Database = {
 export type SidebarNavItem = {
 	name: string;
 };
+
+export type Schema = {
+	column: string;
+	dataType: string;
+	isNullable: string;
+	columnDefault: string;
+	position: number;
+};

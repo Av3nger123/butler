@@ -32,7 +32,7 @@ export default function Page({
 					JSON.stringify({
 						...cluster,
 						password: decrypt(cluster.password),
-						dbname: params.databaseId,
+						database: params.databaseId,
 					})
 				);
 		},
