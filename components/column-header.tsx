@@ -1,4 +1,10 @@
-import { ChevronsUpDown, EyeOff, SortAsc, SortDesc } from "lucide-react";
+import {
+	Braces,
+	ChevronsUpDown,
+	EyeOff,
+	SortAsc,
+	SortDesc,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -10,17 +16,23 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Column } from "@tanstack/react-table";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Schema } from "@/types";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 
 interface DataTableColumnHeaderProps<TData, TValue>
 	extends React.HTMLAttributes<HTMLDivElement> {
 	column: Column<TData, TValue>;
 	title: string;
+	schema: Schema;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
 	column,
 	title,
 	className,
+	schema,
 }: DataTableColumnHeaderProps<TData, TValue>) {
 	if (!column.getCanSort()) {
 		return <div className={cn(className)}>{title}</div>;
@@ -28,20 +40,20 @@ export function DataTableColumnHeader<TData, TValue>({
 
 	return (
 		<div className={cn("flex items-center space-x-2", className)}>
+			<span>{title}</span>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button
 						variant="ghost"
 						size="sm"
-						className="-ml-3 h-8 data-[state=open]:bg-accent"
+						className="h-8 data-[state=open]:bg-accent"
 					>
-						<span>{title}</span>
 						{column.getIsSorted() === "desc" ? (
-							<SortDesc className="ml-2 h-4 w-4" />
+							<SortDesc className="h-4 w-4" />
 						) : column.getIsSorted() === "asc" ? (
-							<SortAsc className="ml-2 h-4 w-4" />
+							<SortAsc className="h-4 w-4" />
 						) : (
-							<ChevronsUpDown className="ml-2 h-4 w-4" />
+							<ChevronsUpDown className="h-4 w-4" />
 						)}
 					</Button>
 				</DropdownMenuTrigger>
@@ -61,6 +73,85 @@ export function DataTableColumnHeader<TData, TValue>({
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button variant="ghost" size="sm">
+						<Braces className="h-3.5 w-3.5 text-muted-foreground/70" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent className="w-80">
+					<div className="grid gap-4">
+						<div className="space-y-2">
+							<h4 className="font-medium leading-none">Column Details</h4>
+						</div>
+						<div className="grid gap-2">
+							<div className="grid grid-cols-3 items-center gap-4">
+								<Label htmlFor="column">Column Name</Label>
+								<Input
+									id="column"
+									defaultValue={schema.column}
+									disabled
+									className="col-span-2 h-8"
+								/>
+							</div>
+							<div className="grid grid-cols-3 items-center gap-4">
+								<Label htmlFor="columnDef">Column Default</Label>
+								<Input
+									id="columnDef"
+									defaultValue={schema.columnDefault}
+									disabled
+									className="col-span-2 h-8"
+								/>
+							</div>
+							<div className="grid grid-cols-3 items-center gap-4">
+								<Label htmlFor="dataType">Data Type</Label>
+								<Input
+									id="dataType"
+									defaultValue={schema.dataType}
+									disabled
+									className="col-span-2 h-8"
+								/>
+							</div>
+							<div className="grid grid-cols-3 items-center gap-4">
+								<Label htmlFor="fk">Foreign Key</Label>
+								<Input
+									id="fk"
+									defaultValue={schema.foreignKey}
+									disabled
+									className="col-span-2 h-8"
+								/>
+							</div>
+							<div className="grid grid-cols-3 items-center gap-4">
+								<Label htmlFor="pk">Is Primary</Label>
+								<Input
+									id="pk"
+									defaultValue={String(schema.isPrimary)}
+									disabled
+									className="col-span-2 h-8"
+								/>
+							</div>
+							<div className="grid grid-cols-3 items-center gap-4">
+								<Label htmlFor="idx">Index</Label>
+								<Input
+									id="idx"
+									defaultValue={String(schema.index)}
+									disabled
+									className="col-span-2 h-8"
+								/>
+							</div>
+							<div className="grid grid-cols-3 items-center gap-4">
+								<Label htmlFor="isNull">Is Nullable</Label>
+								<Input
+									id="isNull"
+									defaultValue={schema.isNullable}
+									disabled
+									className="col-span-2 h-8"
+								/>
+							</div>
+						</div>
+					</div>
+				</PopoverContent>
+			</Popover>
 		</div>
 	);
 }

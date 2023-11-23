@@ -1,7 +1,6 @@
 "use client";
 import DataTable from "@/components/data-table";
 import { Queries } from "@/components/queries";
-import { SQLEditor } from "@/components/sql-editor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getApi, postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
@@ -9,8 +8,8 @@ import { decrypt } from "@/lib/utils";
 import { Schema } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { schemaColumns } from "./schema-columns";
 import { dataColumns } from "./data-columns";
+import { PaginationState } from "@tanstack/react-table";
 
 export default function Page({
 	params,
@@ -18,11 +17,17 @@ export default function Page({
 	params: { clusterId: string; tableId: string; databaseId: string };
 }) {
 	const { cluster } = useClusterStore();
+
+	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10,
+	});
+
 	const { data: queryData } = useQuery({
 		queryKey: ["queries", params.clusterId, params.databaseId, params.tableId],
 		queryFn: async () => {
 			return await getApi(
-				`/api/clusters/${params.clusterId}/queries?databaseId=${params.databaseId}&tableId=${params.tableId}`
+				`/api/clusters/${params.clusterId}/commits?databaseId=${params.databaseId}&tableId=${params.tableId}`
 			);
 		},
 		enabled: !!cluster,
@@ -33,7 +38,7 @@ export default function Page({
 		queryFn: async () => {
 			if (cluster)
 				return await postApi(
-					`http://localhost:8080/schema`,
+					`http://localhost:8080/metadata`,
 					JSON.stringify({
 						...cluster,
 						password: decrypt(cluster.password),
@@ -46,11 +51,18 @@ export default function Page({
 	});
 
 	const { data: tableData } = useQuery({
-		queryKey: ["data", params.clusterId, params.databaseId, params.tableId],
+		queryKey: [
+			"data",
+			params.clusterId,
+			params.databaseId,
+			params.tableId,
+			pageIndex,
+			pageSize,
+		],
 		queryFn: async () => {
 			if (cluster)
 				return await postApi(
-					`http://localhost:8080/data`,
+					`http://localhost:8080/data?page=${pageIndex}&size=${pageSize}`,
 					JSON.stringify({
 						...cluster,
 						password: decrypt(cluster.password),
@@ -65,21 +77,24 @@ export default function Page({
 	const schemas = useMemo(() => {
 		let schemas: Schema[] = [];
 		if (schemaData) {
-			Object.keys(schemaData?.schema).forEach((key) => {
+			Object.keys(schemaData?.metadata).forEach((key) => {
 				schemas.push({
 					column: key,
-					dataType: `${schemaData.schema[key]["dataType"]}${
-						schemaData.schema[key]["maxLength"]["Valid"] === true
-							? `(${schemaData.schema[key]["maxLength"]["Int64"]})`
+					dataType: `${schemaData.metadata[key]["dataType"]}${
+						schemaData.metadata[key]["maxLength"]["Valid"] === true
+							? `(${schemaData.metadata[key]["maxLength"]["Int64"]})`
 							: ""
 					}`,
-					isNullable: schemaData.schema[key]["isNullable"],
+					isNullable: schemaData.metadata[key]["isNullable"],
 					columnDefault: `${
-						schemaData.schema[key]["columnDefault"]["Valid"] === true
-							? `${schemaData.schema[key]["columnDefault"]["String"]}`
+						schemaData.metadata[key]["columnDefault"]["Valid"] === true
+							? `${schemaData.metadata[key]["columnDefault"]["String"]}`
 							: " - "
 					}`,
-					position: parseInt(schemaData.schema[key]["position"]),
+					position: parseInt(schemaData.metadata[key]["position"]),
+					isPrimary: schemaData.metadata[key]["isPrimary"],
+					index: schemaData.metadata[key]["index"],
+					foreignKey: schemaData.metadata[key]["foreignKey"],
 				});
 			});
 		}
@@ -99,28 +114,24 @@ export default function Page({
 	}, [tableData]);
 	return (
 		<div className="p-2">
-			<Tabs defaultValue="queries" className="w-full">
+			<Tabs defaultValue="data" className="w-full">
 				<TabsList className="w-full right-1/2">
-					<TabsTrigger value="queries">Queries</TabsTrigger>
 					<TabsTrigger value="data">Table</TabsTrigger>
-					<TabsTrigger value="schema">Schema</TabsTrigger>
+					<TabsTrigger value="commits">Commits</TabsTrigger>
 				</TabsList>
-				<TabsContent value="queries">
-					<Queries queries={queryData?.queries} />
-				</TabsContent>
 				<TabsContent value="data">
 					<DataTable
-						columns={dataColumns(Object.keys(data[0] ?? {}))}
+						columns={dataColumns(Object.keys(data[0] ?? {}), schemas)}
 						data={data}
 						filterColumn={null}
+						pageIndex={pageIndex}
+						pageSize={pageSize}
+						setPagination={setPagination}
+						count={Math.ceil(tableData?.count / pageSize)}
 					/>
 				</TabsContent>
-				<TabsContent value="schema">
-					<DataTable
-						columns={schemaColumns}
-						data={schemas}
-						filterColumn={null}
-					/>
+				<TabsContent value="queries">
+					<Queries queries={queryData?.queries} />
 				</TabsContent>
 			</Tabs>
 		</div>

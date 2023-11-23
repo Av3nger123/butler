@@ -16,7 +16,7 @@ export async function GET(
 	if (databaseId) {
 		filter["databaseId"] = databaseId;
 	}
-	const queries = await prisma.query.findMany({
+	const queries = await prisma.commit.findMany({
 		skip: page * size,
 		take: size,
 		orderBy: {

@@ -18,4 +18,7 @@ export type Schema = {
 	isNullable: string;
 	columnDefault: string;
 	position: number;
+	isPrimary: boolean;
+	index: boolean;
+	foreignKey: string;
 };

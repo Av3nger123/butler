@@ -2,6 +2,7 @@
 import {
 	ColumnDef,
 	ColumnFiltersState,
+	PaginationState,
 	SortingState,
 	flexRender,
 	getCoreRowModel,
@@ -20,7 +21,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { DataTablePagination } from "./table-pagination";
@@ -30,13 +31,29 @@ interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	filterColumn: string | null;
+	pageIndex: number;
+	pageSize: number;
+	count: number;
+	setPagination: Dispatch<SetStateAction<PaginationState>>;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
 	data,
 	filterColumn,
+	pageIndex,
+	pageSize,
+	setPagination,
+	count,
 }: Readonly<DataTableProps<TData, TValue>>) {
+	const pagination = React.useMemo(
+		() => ({
+			pageIndex,
+			pageSize,
+		}),
+		[pageIndex, pageSize]
+	);
+
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const table = useReactTable({
@@ -44,11 +61,14 @@ export function DataTable<TData, TValue>({
 		columns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
+		manualPagination: true,
+		pageCount: count,
+		onPaginationChange: setPagination,
 		getSortedRowModel: getSortedRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
 		state: {
+			pagination,
 			sorting,
 			columnFilters,
 		},
@@ -97,7 +117,7 @@ export function DataTable<TData, TValue>({
 									data-state={row.getIsSelected() && "selected"}
 								>
 									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
+										<TableCell key={cell.id} className="whitespace-nowrap">
 											{flexRender(
 												cell.column.columnDef.cell,
 												cell.getContext()

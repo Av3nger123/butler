@@ -18,7 +18,7 @@ model Cluster {
     type      String
 }
 
-model Query {
+model Commit {
     id         Int      @id @default(autoincrement())
     createdAt  DateTime @default(now())
     exectedAt  DateTime
