@@ -1,18 +1,59 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-const Cryptr = require("cryptr");
-
-const cryptr = new Cryptr("your_secret_key_here_of_32_chars");
+import * as crypto from "crypto";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
 export function encrypt(payload: string): string {
-	const encryptedData = cryptr.encrypt(payload);
+	// Generate a random nonce (Initialization Vector)
+	const nonce = crypto.randomBytes(12);
+
+	// Create an AES-GCM cipher
+	const cipher = crypto.createCipheriv(
+		"aes-256-gcm",
+		Buffer.from("your_secret_key_here_of_32_chars"),
+		nonce
+	);
+
+	// Encrypt the payload
+	const encryptedPayload = Buffer.concat([
+		cipher.update(payload, "utf8"),
+		cipher.final(),
+	]);
+
+	// Get the authentication tag
+	const tag = cipher.getAuthTag();
+
+	// Combine nonce, encrypted payload, and authentication tag
+	const encryptedData = Buffer.concat([nonce, encryptedPayload, tag]).toString(
+		"base64"
+	);
+
 	return encryptedData;
 }
 export function decrypt(encryptedData: string): string {
-	const decryptedData = cryptr.decrypt(encryptedData);
-	return decryptedData;
+	// Decode the base64-encoded input
+	const buffer = Buffer.from(encryptedData, "base64");
+
+	// Extract the nonce, encrypted payload, and authentication tag
+	const nonce = buffer.slice(0, 12);
+	const encryptedPayload = buffer.slice(12, -16);
+	const tag = buffer.slice(-16);
+
+	// Create an AES-GCM decipher
+	const decipher = crypto.createDecipheriv(
+		"aes-256-gcm",
+		Buffer.from("your_secret_key_here_of_32_chars"),
+		nonce
+	);
+	decipher.setAuthTag(tag);
+
+	// Decrypt the payload
+	const decryptedPayload =
+		decipher.update(encryptedPayload, undefined, "utf8") +
+		decipher.final("utf8");
+
+	return decryptedPayload;
 }

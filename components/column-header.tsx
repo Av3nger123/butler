@@ -89,7 +89,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="column">Column Name</Label>
 								<Input
 									id="column"
-									defaultValue={schema.column}
+									defaultValue={schema?.column}
 									disabled
 									className="col-span-2 h-8"
 								/>
@@ -98,7 +98,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="columnDef">Column Default</Label>
 								<Input
 									id="columnDef"
-									defaultValue={schema.columnDefault}
+									defaultValue={schema?.columnDefault}
 									disabled
 									className="col-span-2 h-8"
 								/>
@@ -107,7 +107,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="dataType">Data Type</Label>
 								<Input
 									id="dataType"
-									defaultValue={schema.dataType}
+									defaultValue={schema?.dataType}
 									disabled
 									className="col-span-2 h-8"
 								/>
@@ -116,7 +116,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="fk">Foreign Key</Label>
 								<Input
 									id="fk"
-									defaultValue={schema.foreignKey}
+									defaultValue={schema?.foreignKey}
 									disabled
 									className="col-span-2 h-8"
 								/>
@@ -125,7 +125,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="pk">Is Primary</Label>
 								<Input
 									id="pk"
-									defaultValue={String(schema.isPrimary)}
+									defaultValue={String(schema?.isPrimary)}
 									disabled
 									className="col-span-2 h-8"
 								/>
@@ -134,7 +134,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="idx">Index</Label>
 								<Input
 									id="idx"
-									defaultValue={String(schema.index)}
+									defaultValue={String(schema?.index)}
 									disabled
 									className="col-span-2 h-8"
 								/>
@@ -143,7 +143,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="isNull">Is Nullable</Label>
 								<Input
 									id="isNull"
-									defaultValue={schema.isNullable}
+									defaultValue={schema?.isNullable}
 									disabled
 									className="col-span-2 h-8"
 								/>

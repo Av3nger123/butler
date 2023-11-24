@@ -41,26 +41,24 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 				style={{ width: `${width / 16}rem` }}
 			>
 				{items.map((item, index) => (
-					<Button key={index} variant="ghost" asChild>
-						<Link
-							href={path + "/" + type + `/${item.name}`}
-							className="flex items-start"
-						>
-							<div className={cn("pb-1")}>
-								<h4
-									className={cn("flex w-full rounded-md p-2 hover:underline", {
-										"bg-muted":
-											pathname === path + "/" + type + `/${item.name}`,
-									})}
-								>
-									{item.name}
-								</h4>
-								{/* {item.items ? (
+					<Link
+						key={index}
+						href={path + "/" + type + `/${item.name}`}
+						className="flex items-start"
+					>
+						<div className={cn("pb-1")}>
+							<h4
+								className={cn("flex w-full rounded-md p-2 hover:underline", {
+									"bg-muted": pathname === path + "/" + type + `/${item.name}`,
+								})}
+							>
+								{item.name}
+							</h4>
+							{/* {item.items ? (
 						<DocsSidebarNavItems items={item.items} pathname={pathname} />
 					) : null} */}
-							</div>
-						</Link>
-					</Button>
+						</div>
+					</Link>
 				))}
 			</div>
 			<div

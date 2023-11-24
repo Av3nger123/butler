@@ -16,7 +16,7 @@ export async function GET(
 	if (databaseId) {
 		filter["databaseId"] = databaseId;
 	}
-	const queries = await prisma.commit.findMany({
+	const commits = await prisma.commit.findMany({
 		skip: page * size,
 		take: size,
 		orderBy: {
@@ -24,5 +24,5 @@ export async function GET(
 		},
 		where: filter,
 	});
-	return Response.json({ queries });
+	return Response.json({ commits });
 }

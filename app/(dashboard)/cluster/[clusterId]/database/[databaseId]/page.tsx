@@ -1,6 +1,6 @@
 "use client";
 
-import { Queries } from "@/components/queries";
+import { Commits } from "@/components/commits";
 import { SidebarNav } from "@/components/side-nav";
 import { getApi, postApi } from "@/lib/api";
 import { tables } from "@/lib/placeholder";
@@ -42,7 +42,7 @@ export default function Page({
 		queryKey: ["queries", params.clusterId, params.databaseId],
 		queryFn: async () => {
 			return await getApi(
-				`/api/clusters/${params.clusterId}/queries?databaseId=${params.databaseId}`
+				`/api/clusters/${params.clusterId}/commits?databaseId=${params.databaseId}`
 			);
 		},
 		enabled: !!cluster,
@@ -66,7 +66,7 @@ export default function Page({
 						name: element.name,
 					}))}
 				/>
-				<Queries queries={data?.queries} />
+				<Commits commits={data?.commits} />
 			</div>
 		</div>
 	);

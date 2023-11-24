@@ -1,6 +1,6 @@
 "use client";
 import DataTable from "@/components/data-table";
-import { Queries } from "@/components/queries";
+import { Commits } from "@/components/commits";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getApi, postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
@@ -130,8 +130,8 @@ export default function Page({
 						count={Math.ceil(tableData?.count / pageSize)}
 					/>
 				</TabsContent>
-				<TabsContent value="queries">
-					<Queries queries={queryData?.queries} />
+				<TabsContent value="commits">
+					<Commits commits={queryData?.commits} />
 				</TabsContent>
 			</Tabs>
 		</div>
