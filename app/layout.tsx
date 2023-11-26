@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider";
+import { firaCode } from "@/components/ui/fonts";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import { Inter as FontSans } from "next/font/google";
@@ -14,14 +15,13 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang="en">
 			<head />
 			<body
 				className={cn(
 					"min-h-screen bg-background font-sans antialiased",
 					fontSans.variable
 				)}
-				suppressHydrationWarning
 			>
 				<ThemeProvider
 					attribute="class"

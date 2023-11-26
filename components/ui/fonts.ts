@@ -6,4 +6,4 @@ export const fontSans = FontSans({
 	variable: "--font-sans",
 });
 
-export const firaCode = FiraCode({ subsets: ["greek"] });
+export const firaCode = FiraCode({ subsets: ["greek"], variable: "--" });

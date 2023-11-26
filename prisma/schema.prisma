@@ -16,16 +16,21 @@ model Cluster {
     username  String
     password  String
     type      String
+
+    @@map("clusters")
 }
 
 model Commit {
     id         Int      @id @default(autoincrement())
+    title      String
     createdAt  DateTime @default(now())
-    exectedAt  DateTime
+    executedAt DateTime
     clusterId  String
     databaseId String
     tableId    String
     sqlQuery   String
+
+    @@map("commits")
 }
 
 model Workspaces {
@@ -48,6 +53,7 @@ model RolePermissions {
     permissionId String @map("permission_id")
 
     @@unique([roleId, permissionId])
+    @@map("role_permission")
 }
 
 model Permissions {
@@ -63,6 +69,7 @@ model UserRoles {
     workspaceId String @map("workspace_id")
 
     @@unique([userId, roleId, workspaceId])
+    @@map("user_roles")
 }
 
 // Auth models

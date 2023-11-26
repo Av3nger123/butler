@@ -7,9 +7,15 @@ import useClusterStore from "@/lib/store/clusterstore";
 import { decrypt } from "@/lib/utils";
 import { Schema } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { dataColumns } from "./data-columns";
 import { PaginationState } from "@tanstack/react-table";
+import useFilterStore from "@/lib/store/filterstore";
+import { TableToolbar } from "@/components/table-toolbar";
+import { has } from "lodash";
+import { TableFilter } from "@/components/table-filter";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Filters } from "./filters";
 
 export default function Page({
 	params,
@@ -17,7 +23,6 @@ export default function Page({
 	params: { clusterId: string; tableId: string; databaseId: string };
 }) {
 	const { cluster } = useClusterStore();
-
 	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
 		pageSize: 10,
@@ -50,7 +55,7 @@ export default function Page({
 		enabled: !!cluster,
 	});
 
-	const { data: tableData } = useQuery({
+	const { data: tableData, isLoading } = useQuery({
 		queryKey: [
 			"data",
 			params.clusterId,
@@ -75,10 +80,10 @@ export default function Page({
 	});
 
 	const schemas = useMemo(() => {
-		let schemas: Schema[] = [];
+		let schemas: { [key: string]: Schema } = {};
 		if (schemaData) {
 			Object.keys(schemaData?.metadata).forEach((key) => {
-				schemas.push({
+				schemas[key] = {
 					column: key,
 					dataType: `${schemaData.metadata[key]["dataType"]}${
 						schemaData.metadata[key]["maxLength"]["Valid"] === true
@@ -95,10 +100,10 @@ export default function Page({
 					isPrimary: schemaData.metadata[key]["isPrimary"],
 					index: schemaData.metadata[key]["index"],
 					foreignKey: schemaData.metadata[key]["foreignKey"],
-				});
+				};
 			});
 		}
-		return schemas.sort((a, b) => a.position - b.position);
+		return schemas;
 	}, [schemaData]);
 
 	const data = useMemo(() => {
@@ -112,14 +117,18 @@ export default function Page({
 		}
 		return data;
 	}, [tableData]);
+
+	const key = `${params.clusterId}~${params.databaseId}~${params.tableId}`;
 	return (
 		<div className="p-2">
 			<Tabs defaultValue="data" className="w-full">
-				<TabsList className="w-full right-1/2">
+				<TabsList>
 					<TabsTrigger value="data">Table</TabsTrigger>
 					<TabsTrigger value="commits">Commits</TabsTrigger>
 				</TabsList>
 				<TabsContent value="data">
+					<TableToolbar path={key} />
+					<Filters path={key} schemas={schemas} />
 					<DataTable
 						columns={dataColumns(Object.keys(data[0] ?? {}), schemas)}
 						data={data}

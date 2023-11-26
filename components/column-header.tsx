@@ -39,44 +39,11 @@ export function DataTableColumnHeader<TData, TValue>({
 	}
 
 	return (
-		<div className={cn("flex items-center space-x-2", className)}>
-			<span>{title}</span>
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button
-						variant="ghost"
-						size="sm"
-						className="h-8 data-[state=open]:bg-accent"
-					>
-						{column.getIsSorted() === "desc" ? (
-							<SortDesc className="h-4 w-4" />
-						) : column.getIsSorted() === "asc" ? (
-							<SortAsc className="h-4 w-4" />
-						) : (
-							<ChevronsUpDown className="h-4 w-4" />
-						)}
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align="start">
-					<DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-						<SortAsc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-						Asc
-					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-						<SortDesc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-						Desc
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-						<EyeOff className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-						Hide
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
+		<div className={cn("flex items-center space-x-1", className)}>
 			<Popover>
 				<PopoverTrigger asChild>
 					<Button variant="ghost" size="sm">
-						<Braces className="h-3.5 w-3.5 text-muted-foreground/70" />
+						<span>{title}</span>
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-80">
@@ -152,6 +119,38 @@ export function DataTableColumnHeader<TData, TValue>({
 					</div>
 				</PopoverContent>
 			</Popover>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						variant="ghost"
+						size="sm"
+						className="h-8 data-[state=open]:bg-accent"
+					>
+						{column.getIsSorted() === "desc" ? (
+							<SortDesc className="h-4 w-4" />
+						) : column.getIsSorted() === "asc" ? (
+							<SortAsc className="h-4 w-4" />
+						) : (
+							<ChevronsUpDown className="h-4 w-4" />
+						)}
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="start">
+					<DropdownMenuItem onClick={() => column.toggleSorting(false)}>
+						<SortAsc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+						Asc
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
+						<SortDesc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+						Desc
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+						<EyeOff className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+						Hide
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
 		</div>
 	);
 }

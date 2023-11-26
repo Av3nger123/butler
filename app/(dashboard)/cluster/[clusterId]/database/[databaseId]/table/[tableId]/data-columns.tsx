@@ -1,12 +1,13 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/column-header";
+import { EditableCell } from "@/components/table-cells/EditableCell";
 import { Schema } from "@/types";
 import { Column, ColumnDef } from "@tanstack/react-table";
 
 export function dataColumns(
 	keys: string[],
-	schemas: Schema[]
+	schemas: { [key: string]: Schema }
 ): ColumnDef<any>[] {
 	let result: ColumnDef<any>[] = [];
 	keys.forEach((key) => {
@@ -16,10 +17,10 @@ export function dataColumns(
 				<DataTableColumnHeader
 					column={column}
 					title={key}
-					schema={schemas.filter((schema) => schema.column === key)[0]}
+					schema={schemas[key]}
 				/>
 			),
-			cell: ({ row }) => <div>{row.getValue(key)}</div>,
+			cell: EditableCell,
 			enableSorting: true,
 			enableHiding: true,
 		});

@@ -26,6 +26,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { DataTablePagination } from "./table-pagination";
 import { DataTableViewOptions } from "./column-toggle";
+import { usePathname } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
