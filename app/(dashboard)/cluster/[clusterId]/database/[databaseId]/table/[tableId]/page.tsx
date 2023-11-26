@@ -23,6 +23,7 @@ export default function Page({
 	params: { clusterId: string; tableId: string; databaseId: string };
 }) {
 	const { cluster } = useClusterStore();
+	const filters = useFilterStore((state) => state.filters);
 	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
 		pageSize: 10,
@@ -55,7 +56,11 @@ export default function Page({
 		enabled: !!cluster,
 	});
 
-	const { data: tableData, isLoading } = useQuery({
+	const {
+		data: tableData,
+		isLoading,
+		refetch,
+	} = useQuery({
 		queryKey: [
 			"data",
 			params.clusterId,
@@ -65,9 +70,22 @@ export default function Page({
 			pageSize,
 		],
 		queryFn: async () => {
-			if (cluster)
+			if (cluster) {
+				let url = `http://localhost:8080/data?page=${pageIndex}&size=${pageSize}`;
+				if (has(filters, key)) {
+					let filterStrings: string[] = [];
+					filters[key].forEach((filter) => {
+						filterStrings.push(
+							`${filter.column}:${filter.operator}:${filter.value}`
+						);
+					});
+					url += `&filter=${filterStrings.join("|")}`;
+					if (filterStrings.length > 1) {
+						url += "&operator=and";
+					}
+				}
 				return await postApi(
-					`http://localhost:8080/data?page=${pageIndex}&size=${pageSize}`,
+					url,
 					JSON.stringify({
 						...cluster,
 						password: decrypt(cluster.password),
@@ -75,6 +93,7 @@ export default function Page({
 						table: params.tableId,
 					})
 				);
+			}
 		},
 		enabled: !!cluster,
 	});
@@ -109,7 +128,7 @@ export default function Page({
 	const data = useMemo(() => {
 		let data: any[] = [];
 		if (tableData) {
-			tableData?.data.forEach((row: any) => {
+			tableData?.data?.forEach((row: any) => {
 				data.push({
 					...row,
 				});
@@ -127,7 +146,7 @@ export default function Page({
 					<TabsTrigger value="commits">Commits</TabsTrigger>
 				</TabsList>
 				<TabsContent value="data">
-					<TableToolbar path={key} />
+					<TableToolbar path={key} refetch={refetch} />
 					<Filters path={key} schemas={schemas} />
 					<DataTable
 						columns={dataColumns(Object.keys(data[0] ?? {}), schemas)}

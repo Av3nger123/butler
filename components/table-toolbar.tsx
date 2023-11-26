@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	ArrowUpFromLine,
 	Eye,
@@ -10,13 +12,24 @@ import { Button } from "./ui/button";
 import useFilterStore from "@/lib/store/filterstore";
 import { has } from "lodash";
 
-export function TableToolbar({ path }: { path: string }) {
+export function TableToolbar({
+	path,
+	refetch,
+}: {
+	path: string;
+	refetch: any;
+}) {
 	const { filters, addFilter, clear } = useFilterStore();
 
 	return (
 		<div className="flex items-center justify-center mb-1 gap-1 rounded-sm p-1">
-			<Button variant="secondary">
-				<Play className="mr-2 h-4 w-4 opacity-70" /> Execute
+			<Button variant="secondary" onClick={() => refetch()}>
+				<Play className="mr-2 h-4 w-4 opacity-70" />{" "}
+				{typeof window !== "undefined"
+					? has(filters, path) && filters[path].length > 0
+						? "Execute"
+						: "Refetch"
+					: "Refetch"}
 			</Button>
 			<Button variant="secondary">
 				<Eye className="mr-2 h-4 w-4 opacity-70" /> Query
@@ -27,11 +40,20 @@ export function TableToolbar({ path }: { path: string }) {
 			<Button
 				variant="secondary"
 				onClick={() => addFilter(path)}
-				disabled={has(filters, path) && filters[path].length > 0}
+				disabled={
+					typeof window !== "undefined"
+						? has(filters, path) && filters[path].length > 0
+						: false
+				}
 			>
 				<Filter className="mr-2 h-4 w-4 opacity-70" /> Filter
 			</Button>
-			<Button variant="secondary" onClick={() => clear(path)}>
+			<Button
+				variant="secondary"
+				onClick={() => {
+					clear(path);
+				}}
+			>
 				<XCircle className="mr-2 h-4 w-4 opacity-70" /> Clear
 			</Button>
 		</div>
