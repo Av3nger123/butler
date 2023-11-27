@@ -1,4 +1,5 @@
 import {
+	AlignJustify,
 	Braces,
 	ChevronsUpDown,
 	EyeOff,
@@ -143,6 +144,10 @@ export function DataTableColumnHeader<TData, TValue>({
 					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
 						<SortDesc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
 						Desc
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => column.clearSorting()}>
+						<AlignJustify className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+						Clear
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
