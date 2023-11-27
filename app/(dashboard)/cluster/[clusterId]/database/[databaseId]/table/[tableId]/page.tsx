@@ -92,7 +92,6 @@ export default function Page({
 						sorting[0].desc ? "desc" : "asc"
 					}`;
 				}
-				console.log(sorting);
 				return await postApi(
 					url,
 					JSON.stringify({
