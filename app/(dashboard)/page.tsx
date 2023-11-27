@@ -15,12 +15,14 @@ import { DatabaseForm } from "@/components/database-form";
 import { useQuery } from "@tanstack/react-query";
 import { DatabaseCards } from "./database-cards";
 import { getApi } from "@/lib/api";
+import useWorkspaceStore from "@/lib/store/workspacestore";
 
 export default function Home() {
+	const workspace = useWorkspaceStore((state) => state.workspace);
 	const { data, refetch } = useQuery({
-		queryKey: ["clusters"],
+		queryKey: ["clusters", workspace?.id],
 		queryFn: async () => {
-			return await getApi("/api/clusters");
+			return await getApi(`/api/clusters?workspaceId=${workspace?.id}`);
 		},
 	});
 	return (

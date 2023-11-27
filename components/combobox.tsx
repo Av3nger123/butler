@@ -45,8 +45,9 @@ export function Combobox({
 					<CommandGroup className="overflow-y-auto h-96">
 						{items.map((item) => (
 							<CommandItem
-								key={item?.label}
+								key={item?.value}
 								value={item?.value}
+								onChange={(e) => {}}
 								onSelect={(currentValue) => {
 									onChange(currentValue);
 									setOpen(false);

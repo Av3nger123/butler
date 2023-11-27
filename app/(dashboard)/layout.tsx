@@ -1,5 +1,6 @@
 import { AppBar } from "@/components/app-bar";
 import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 interface DashboardLayoutProps {
 	children?: React.ReactNode;

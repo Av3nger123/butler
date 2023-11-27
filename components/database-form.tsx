@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { decrypt, encrypt } from "@/lib/utils";
 import { postApi } from "@/lib/api";
+import useWorkspaceStore from "@/lib/store/workspacestore";
 
 const databaseSchema = z.object({
 	name: z.string().min(2, {
@@ -63,6 +64,7 @@ export function DatabaseForm({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseFormProps>) {
+	const workspace = useWorkspaceStore((state) => state.workspace);
 	const form = useForm<z.infer<typeof databaseSchema>>({
 		resolver: zodResolver(databaseSchema),
 		defaultValues: {
@@ -82,6 +84,7 @@ export function DatabaseForm({
 		if (databaseCluster) {
 			request["id"] = databaseCluster?.id;
 		}
+		request["workspace_id"] = workspace?.id;
 		request["password"] = encrypt(values.password);
 		const response = await postApi("/api/clusters", JSON.stringify(request));
 		refetch();

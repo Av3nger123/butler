@@ -1,8 +1,16 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-	const clusters = await prisma.cluster.findMany();
+export async function GET(request: NextRequest) {
+	const workspaceId = request.nextUrl.searchParams.get("workspaceId");
+	if (workspaceId == null) {
+		return Response.json({ clusters: [] });
+	}
+	const clusters = await prisma.cluster.findMany({
+		where: {
+			workspace_id: parseInt(workspaceId),
+		},
+	});
 	return Response.json({ clusters });
 }
 

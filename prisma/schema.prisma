@@ -8,14 +8,16 @@ generator client {
 }
 
 model Cluster {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    name      String   @db.VarChar(255)
-    host      String
-    port      String
-    username  String
-    password  String
-    type      String
+    id           Int        @id @default(autoincrement())
+    createdAt    DateTime   @default(now())
+    name         String     @db.VarChar(255)
+    host         String
+    port         String
+    username     String
+    password     String
+    type         String
+    workspace_id Int        @map("workspace_id")
+    workspace    Workspaces @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
 
     @@map("clusters")
 }
@@ -34,9 +36,11 @@ model Commit {
 }
 
 model Workspaces {
-    id        Int      @id @default(autoincrement())
-    name      String   @db.VarChar(255)
-    createdAt DateTime @default(now())
+    id            Int             @id @default(autoincrement())
+    name          String          @db.VarChar(255)
+    createdAt     DateTime        @default(now())
+    WorkspaceUser WorkspaceUser[]
+    Cluster       Cluster[]
 
     @@map("workspaces")
 }
@@ -66,7 +70,7 @@ model Permissions {
 model UserRoles {
     userId      String @map("user_id")
     roleId      String @map("role_id")
-    workspaceId String @map("workspace_id")
+    workspaceId Int    @map("workspace_id")
 
     @@unique([userId, roleId, workspaceId])
     @@map("user_roles")
@@ -104,15 +108,28 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String          @id @default(cuid())
     name          String?
-    email         String?   @unique
-    emailVerified DateTime? @map("email_verified")
+    email         String?         @unique
+    emailVerified DateTime?       @map("email_verified")
     image         String?
+    username      String?
     accounts      Account[]
     sessions      Session[]
+    workspaceUser WorkspaceUser[]
 
     @@map("users")
+}
+
+model WorkspaceUser {
+    workspace_id Int
+    user_id      String
+
+    workspace Workspaces @relation(fields: [workspace_id], references: [id])
+    user      User       @relation(fields: [user_id], references: [id])
+
+    @@id([workspace_id, user_id])
+    @@map("workspaceusers")
 }
 
 model VerificationToken {
