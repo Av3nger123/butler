@@ -47,7 +47,9 @@ export default function ClusterPage({
 
 	return (
 		<div className="h-full w-full">
-			<SidebarNav type="database" items={databases} />
+			<div className="border-r w-fit h-full">
+				<SidebarNav type="database" items={databases} />
+			</div>
 		</div>
 	);
 }

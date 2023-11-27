@@ -9,7 +9,7 @@ import { Schema } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { dataColumns } from "./data-columns";
-import { PaginationState } from "@tanstack/react-table";
+import { PaginationState, SortingState } from "@tanstack/react-table";
 import useFilterStore from "@/lib/store/filterstore";
 import { TableToolbar } from "@/components/table-toolbar";
 import { has } from "lodash";
@@ -23,6 +23,8 @@ export default function Page({
 	params: { clusterId: string; tableId: string; databaseId: string };
 }) {
 	const { cluster } = useClusterStore();
+	const [sorting, setSorting] = useState<SortingState>([]);
+
 	const filters = useFilterStore((state) => state.filters);
 	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
@@ -68,6 +70,7 @@ export default function Page({
 			params.tableId,
 			pageIndex,
 			pageSize,
+			sorting,
 		],
 		queryFn: async () => {
 			if (cluster) {
@@ -84,6 +87,12 @@ export default function Page({
 						url += "&operator=and";
 					}
 				}
+				if (sorting.length > 0) {
+					url += `&sort=${sorting[0]?.id}&order=${
+						sorting[0].desc ? "desc" : "asc"
+					}`;
+				}
+				console.log(sorting);
 				return await postApi(
 					url,
 					JSON.stringify({
@@ -154,6 +163,8 @@ export default function Page({
 						filterColumn={null}
 						pageIndex={pageIndex}
 						pageSize={pageSize}
+						sorting={sorting}
+						setSorting={setSorting}
 						setPagination={setPagination}
 						count={Math.ceil(tableData?.count / pageSize)}
 					/>

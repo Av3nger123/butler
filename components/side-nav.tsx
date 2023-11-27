@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useEffect, useRef, useState } from "react";
 import { ChevronsLeftRightIcon } from "lucide-react";
+import { ScrollArea } from "./ui/scroll-area";
 
 export interface SidebarNavProps {
 	items: SidebarNavItem[];
@@ -36,8 +37,8 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 
 	return items?.length ? (
 		<div className="flex">
-			<div
-				className="p-2 border-r border-double  w-fit h-full flex flex-col overflow-hidden"
+			<ScrollArea
+				className="w-fit h-full overflow-x-hidden"
 				style={{ width: `${width / 16}rem` }}
 			>
 				{items.map((item, index) => (
@@ -54,18 +55,15 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 							>
 								{item.name}
 							</h4>
-							{/* {item.items ? (
-						<DocsSidebarNavItems items={item.items} pathname={pathname} />
-					) : null} */}
 						</div>
 					</Link>
 				))}
-			</div>
+			</ScrollArea>
 			<div
 				onMouseDown={() => {
 					isResized.current = true;
 				}}
-				className="w-1 cursor-col-resize select-none"
+				className="w-px cursor-col-resize select-none"
 			/>
 		</div>
 	) : null;

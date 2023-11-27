@@ -60,12 +60,14 @@ export default function Page({
 	return (
 		<div className="h-full w-full">
 			<div className="flex flex-row">
-				<SidebarNav
-					type="table"
-					items={tables?.map((element: SidebarNavItem) => ({
-						name: element.name,
-					}))}
-				/>
+				<div className="border-r w-fit h-full">
+					<SidebarNav
+						type="table"
+						items={tables?.map((element: SidebarNavItem) => ({
+							name: element.name,
+						}))}
+					/>
+				</div>
 				<Commits commits={data?.commits} />
 			</div>
 		</div>

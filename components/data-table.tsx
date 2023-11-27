@@ -2,6 +2,7 @@
 import {
 	ColumnDef,
 	ColumnFiltersState,
+	OnChangeFn,
 	PaginationState,
 	SortingState,
 	flexRender,
@@ -36,6 +37,8 @@ interface DataTableProps<TData, TValue> {
 	pageSize: number;
 	count: number;
 	setPagination: Dispatch<SetStateAction<PaginationState>>;
+	sorting: SortingState;
+	setSorting: OnChangeFn<SortingState>;
 }
 
 export function DataTable<TData, TValue>({
@@ -45,6 +48,8 @@ export function DataTable<TData, TValue>({
 	pageIndex,
 	pageSize,
 	setPagination,
+	sorting,
+	setSorting,
 	count,
 }: Readonly<DataTableProps<TData, TValue>>) {
 	const pagination = React.useMemo(
@@ -55,7 +60,6 @@ export function DataTable<TData, TValue>({
 		[pageIndex, pageSize]
 	);
 
-	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const table = useReactTable({
 		data,
@@ -63,6 +67,7 @@ export function DataTable<TData, TValue>({
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		manualPagination: true,
+		manualSorting: true,
 		pageCount: count,
 		onPaginationChange: setPagination,
 		getSortedRowModel: getSortedRowModel(),
