@@ -40,10 +40,10 @@ import {
 import { Button } from "./ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "@/lib/api";
-import { Workspaces } from "@prisma/client";
 import useWorkspaceStore from "@/lib/store/workspacestore";
 import { useMemo } from "react";
-import { CreateWorkspace } from "./profile-menu/workspace";
+import { CreateWorkspace, WorkspaceDetails } from "./profile-menu/workspace";
+import { Workspace } from "@prisma/client";
 
 export function AppBar() {
 	const { data: session } = useSession();
@@ -56,13 +56,15 @@ export function AppBar() {
 	const { data, refetch } = useQuery({
 		queryKey: ["workspaces"],
 		queryFn: async () => {
-			return await getApi("/api/workspaces");
+			let res = await getApi("/api/workspaces");
+			setWorkspace(res?.workspaces[0]);
+			return res;
 		},
 	});
 
 	const workspaces = useMemo(
 		() =>
-			data?.workspaces?.map((workspace: Workspaces) => ({
+			data?.workspaces?.map((workspace: Workspace) => ({
 				value: workspace?.id,
 				label: workspace?.name,
 			})),
@@ -80,7 +82,7 @@ export function AppBar() {
 					onChange={(value: String) => {
 						setWorkspace(
 							data?.workspaces?.filter(
-								(workspace: Workspaces) => workspace.name.toLowerCase() == value
+								(workspace: Workspace) => workspace.name.toLowerCase() == value
 							)[0]
 						);
 					}}
@@ -103,6 +105,7 @@ export function AppBar() {
 					<DropdownMenuContent className="w-56">
 						<DropdownMenuLabel>My Account</DropdownMenuLabel>
 						<DropdownMenuSeparator />
+						<WorkspaceDetails workspace={workspace} />
 						<CreateWorkspace refetch={refetch} />
 						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={() => signOut()}>

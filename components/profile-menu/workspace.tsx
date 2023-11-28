@@ -1,4 +1,4 @@
-import { ChevronDownIcon, Plus } from "lucide-react";
+import { Box, ChevronDownIcon, Delete, Plus, Trash } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import {
@@ -28,130 +28,167 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { useState } from "react";
-import { postApi } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { getApi, postApi } from "@/lib/api";
 import { json } from "stream/consumers";
+import { Workspace } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "../ui/badge";
+import { User } from "../user";
+import { debounce } from "lodash";
 
-export function Workspace() {
+export function WorkspaceDetails({ workspace }: { workspace: any }) {
+	const [email, setEmail] = useState("");
+
+	const { data } = useQuery({
+		queryKey: ["workspace", workspace?.id],
+		queryFn: () => {
+			return getApi(`/api/workspaces/${workspace?.id}`);
+		},
+		enabled: !!workspace?.id,
+	});
+
+	const { data: rolesData } = useQuery({
+		queryKey: ["roles"],
+		queryFn: () => {
+			return getApi(`/api/roles`);
+		},
+	});
+
+	const { data: usersData } = useQuery({
+		queryKey: ["users", email],
+		queryFn: () => {
+			return getApi(`/api/users?email=${email}`);
+		},
+	});
+
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>Team Members</CardTitle>
-				<CardDescription>
-					Invite your team members to collaborate.
-				</CardDescription>
-			</CardHeader>
-			<CardContent className="grid gap-6">
-				<div className="flex items-center justify-between space-x-4">
-					<div className="flex items-center space-x-4">
-						<Avatar>
-							<AvatarImage src="/avatars/01.png" />
-							<AvatarFallback>OM</AvatarFallback>
-						</Avatar>
-						<div>
-							<p className="text-sm font-medium leading-none">Sofia Davis</p>
-							<p className="text-sm text-muted-foreground">m@example.com</p>
-						</div>
-					</div>
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button variant="outline" className="ml-auto">
-								Owner{" "}
-								<ChevronDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent className="p-0" align="end">
-							<Command>
-								<CommandInput placeholder="Select new role..." />
-								<CommandList>
-									<CommandEmpty>No roles found.</CommandEmpty>
-									<CommandGroup>
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Viewer</p>
-											<p className="text-sm text-muted-foreground">
-												Can view and comment.
-											</p>
-										</CommandItem>
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Developer</p>
-											<p className="text-sm text-muted-foreground">
-												Can view, comment and edit.
-											</p>
-										</CommandItem>
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Billing</p>
-											<p className="text-sm text-muted-foreground">
-												Can view, comment and manage billing.
-											</p>
-										</CommandItem>
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Owner</p>
-											<p className="text-sm text-muted-foreground">
-												Admin-level access to all resources.
-											</p>
-										</CommandItem>
-									</CommandGroup>
-								</CommandList>
-							</Command>
-						</PopoverContent>
-					</Popover>
+		<Dialog>
+			<DialogTrigger>
+				<div className="flex flex-row items-center p-1">
+					<Box className="mr-2 h-4 w-4" />
+					Workspace
 				</div>
-				<div className="flex items-center justify-between space-x-4">
-					<div className="flex items-center space-x-4">
-						<Avatar>
-							<AvatarImage src="/avatars/02.png" />
-							<AvatarFallback>JL</AvatarFallback>
-						</Avatar>
-						<div>
-							<p className="text-sm font-medium leading-none">Jackson Lee</p>
-							<p className="text-sm text-muted-foreground">p@example.com</p>
-						</div>
-					</div>
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button variant="outline" className="ml-auto">
-								Member{" "}
-								<ChevronDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent className="p-0" align="end">
-							<Command>
-								<CommandInput placeholder="Select new role..." />
-								<CommandList>
-									<CommandEmpty>No roles found.</CommandEmpty>
-									<CommandGroup className="p-1.5">
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Viewer</p>
-											<p className="text-sm text-muted-foreground">
-												Can view and comment.
-											</p>
-										</CommandItem>
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Developer</p>
-											<p className="text-sm text-muted-foreground">
-												Can view, comment and edit.
-											</p>
-										</CommandItem>
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Billing</p>
-											<p className="text-sm text-muted-foreground">
-												Can view, comment and manage billing.
-											</p>
-										</CommandItem>
-										<CommandItem className="teamaspace-y-1 flex flex-col items-start px-4 py-2">
-											<p>Owner</p>
-											<p className="text-sm text-muted-foreground">
-												Admin-level access to all resources.
-											</p>
-										</CommandItem>
-									</CommandGroup>
-								</CommandList>
-							</Command>
-						</PopoverContent>
-					</Popover>
+			</DialogTrigger>
+			<DialogContent className="flex justify-start items-start flex-col max-w-screen-sm h-[500px] grid-rows-6">
+				<DialogHeader>
+					<DialogTitle>Workspace</DialogTitle>
+				</DialogHeader>
+				<div className="grid grid-cols-4 items-center gap-x-5 row-span-1">
+					<Label htmlFor="name" className="text-center">
+						Workspace Name:
+					</Label>
+					<Input
+						id="name"
+						placeholder="Cosmic Venture"
+						value={workspace?.name}
+						className="col-span-3"
+					/>
 				</div>
-			</CardContent>
-		</Card>
+				<Card className="w-full h-full row-span-3">
+					<CardHeader>
+						<CardTitle>Workspace Members</CardTitle>
+						<CardDescription>
+							Invite your team members to collaborate.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="grid gap-6 overflow-y-auto">
+						{data?.workspace?.WorkspaceUser?.map((workspaceUser: any) => {
+							return (
+								<div
+									className="flex items-center justify-start gap-4"
+									key={workspaceUser?.user_id}
+								>
+									<div className="flex items-center space-x-4">
+										<Avatar>
+											<AvatarImage src={workspaceUser?.user?.image} />
+											<AvatarFallback>
+												{workspaceUser?.user?.name
+													?.split(" ")
+													.map((word: string) => word[0])
+													.join("")}
+											</AvatarFallback>
+										</Avatar>
+										<div>
+											<p className="text-sm font-medium leading-none">
+												{workspaceUser?.user?.username}
+											</p>
+											<p className="text-sm text-muted-foreground">
+												{workspaceUser?.user?.email}
+											</p>
+										</div>
+									</div>
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button variant="outline">
+												{workspaceUser?.role?.label}
+												<ChevronDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent className="p-0" align="end">
+											<Command>
+												<CommandInput placeholder="Select new role..." />
+												<CommandList>
+													<CommandEmpty>No roles found.</CommandEmpty>
+													<CommandGroup>
+														{rolesData?.roles?.map((role: any) => {
+															return (
+																<CommandItem
+																	key={role?.id}
+																	className="flex flex-col items-start px-4 py-2"
+																>
+																	<p>{role?.label}</p>
+																</CommandItem>
+															);
+														})}
+													</CommandGroup>
+												</CommandList>
+											</Command>
+										</PopoverContent>
+									</Popover>
+									<Button variant={"ghost"} size={"icon"}>
+										<Trash className="h-4 w-4" />
+									</Button>
+								</div>
+							);
+						})}
+					</CardContent>
+				</Card>
+				<div className="w-full grid grid-cols-4 gap-3 items-start row-span-1">
+					<Command className="rounded-lg border shadow-md col-span-3">
+						<CommandInput
+							placeholder="Type an email or search..."
+							value={email}
+							onChangeCapture={(e) => {
+								setEmail(e.currentTarget.value);
+							}}
+						/>
+						<CommandList>
+							{usersData?.users?.length === 0 && (
+								<CommandEmpty>No results found.</CommandEmpty>
+							)}
+							{usersData?.users?.length > 0 && (
+								<CommandGroup heading="User Suggestions">
+									{usersData?.users.map((user: any) => (
+										<CommandItem key={user.email}>
+											<div
+												onClick={() => {
+													console.log("click event");
+													setEmail(user.email);
+												}}
+											>
+												<User user={user} />
+											</div>
+										</CommandItem>
+									))}
+								</CommandGroup>
+							)}
+						</CommandList>
+					</Command>
+					<Button>Invite</Button>
+				</div>
+			</DialogContent>
+		</Dialog>
 	);
 }
 

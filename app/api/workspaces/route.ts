@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 			email: session?.user?.email,
 		},
 		include: {
-			workspaceUser: {
+			WorkspaceUser: {
 				include: {
 					workspace: true,
 				},
@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
 		},
 	});
 
-	if (dbUser?.workspaceUser?.length == 0) {
-		const newWorkspace = await prisma.workspaces.create({
+	if (dbUser?.WorkspaceUser?.length == 0) {
+		const newWorkspace = await prisma.workspace.create({
 			data: {
 				name: "My Workspace",
 				createdAt: new Date(),
@@ -31,13 +31,14 @@ export async function GET(request: NextRequest) {
 			data: {
 				workspace_id: newWorkspace.id,
 				user_id: dbUser.id,
+				role_id: "admin",
 			},
 		});
 
 		return Response.json({ workspaces: [newWorkspace] });
 	}
 
-	const workspaces = dbUser?.workspaceUser.map(
+	const workspaces = dbUser?.WorkspaceUser.map(
 		(workspaceRelation) => workspaceRelation.workspace
 	);
 
@@ -59,7 +60,7 @@ export async function POST(
 	}
 	const requestBody = await request.json();
 	if (requestBody?.id) {
-		const workspace = await prisma.workspaces.update({
+		const workspace = await prisma.workspace.update({
 			where: {
 				id: parseInt(requestBody?.id),
 			},
@@ -67,13 +68,14 @@ export async function POST(
 		});
 		return Response.json({ workspace });
 	} else {
-		const workspace = await prisma.workspaces.create({
+		const workspace = await prisma.workspace.create({
 			data: requestBody,
 		});
 		await prisma.workspaceUser.create({
 			data: {
 				workspace_id: workspace.id,
 				user_id: dbUser.id,
+				role_id: "admin",
 			},
 		});
 		return Response.json({ workspace });

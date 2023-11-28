@@ -24,6 +24,7 @@ export default function Home() {
 		queryFn: async () => {
 			return await getApi(`/api/clusters?workspaceId=${workspace?.id}`);
 		},
+		enabled: !!workspace?.id,
 	});
 	return (
 		<main className="flex flex-col items-center justify-between p-10">

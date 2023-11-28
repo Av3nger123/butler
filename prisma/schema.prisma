@@ -8,16 +8,16 @@ generator client {
 }
 
 model Cluster {
-    id           Int        @id @default(autoincrement())
-    createdAt    DateTime   @default(now())
-    name         String     @db.VarChar(255)
+    id           Int       @id @default(autoincrement())
+    createdAt    DateTime  @default(now())
+    name         String    @db.VarChar(255)
     host         String
     port         String
     username     String
     password     String
     type         String
-    workspace_id Int        @map("workspace_id")
-    workspace    Workspaces @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+    workspace_id Int       @map("workspace_id")
+    workspace    Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
 
     @@map("clusters")
 }
@@ -35,45 +35,60 @@ model Commit {
     @@map("commits")
 }
 
-model Workspaces {
+model Workspace {
     id            Int             @id @default(autoincrement())
     name          String          @db.VarChar(255)
     createdAt     DateTime        @default(now())
-    WorkspaceUser WorkspaceUser[]
     Cluster       Cluster[]
+    WorkspaceUser WorkspaceUser[]
 
     @@map("workspaces")
 }
 
-model Roles {
-    id        String   @id @db.VarChar(255)
-    createdAt DateTime @default(now())
+// WorkspaceUser model
+model WorkspaceUser {
+    workspace_id Int       @map("workspace_id")
+    user_id      String    @map("user_id")
+    role_id      String
+    createdAt    DateTime  @default(now())
+    role         Role      @relation(fields: [role_id], references: [id])
+    user         User      @relation(fields: [user_id], references: [id])
+    workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+    @@id([workspace_id, user_id, role_id])
+    @@map("workspaceusers")
+}
+
+// Role model
+model Role {
+    id              String            @id @db.VarChar(255)
+    label           String?
+    createdAt       DateTime          @default(now())
+    WorkspaceUser   WorkspaceUser[]
+    RolePermissions RolePermissions[]
 
     @@map("roles")
 }
 
-model RolePermissions {
-    roleId       String @map("role_id")
-    permissionId String @map("permission_id")
-
-    @@unique([roleId, permissionId])
-    @@map("role_permission")
-}
-
-model Permissions {
-    id        String   @id @db.VarChar(255)
-    createdAt DateTime @default(now())
+// Permission model
+model Permission {
+    id              String            @id @db.VarChar(255)
+    label           String?
+    createdAt       DateTime          @default(now())
+    RolePermissions RolePermissions[]
 
     @@map("permissions")
 }
 
-model UserRoles {
-    userId      String @map("user_id")
-    roleId      String @map("role_id")
-    workspaceId Int    @map("workspace_id")
+// RolePermissions model
+model RolePermissions {
+    roleId       String     @map("role_id")
+    permissionId String     @map("permission_id")
+    role         Role       @relation(fields: [roleId], references: [id])
+    permission   Permission @relation(fields: [permissionId], references: [id])
 
-    @@unique([userId, roleId, workspaceId])
-    @@map("user_roles")
+    @@unique([roleId, permissionId])
+    @@map("role_permissions")
 }
 
 // Auth models
@@ -116,20 +131,9 @@ model User {
     username      String?
     accounts      Account[]
     sessions      Session[]
-    workspaceUser WorkspaceUser[]
+    WorkspaceUser WorkspaceUser[]
 
     @@map("users")
-}
-
-model WorkspaceUser {
-    workspace_id Int
-    user_id      String
-
-    workspace Workspaces @relation(fields: [workspace_id], references: [id])
-    user      User       @relation(fields: [user_id], references: [id])
-
-    @@id([workspace_id, user_id])
-    @@map("workspaceusers")
 }
 
 model VerificationToken {
