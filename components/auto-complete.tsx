@@ -12,9 +12,9 @@ import { useState, useRef, useCallback, type KeyboardEvent } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
-import { User } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "@/lib/api";
+import { User } from "./user";
 
 export type Option = {
 	id: string;
@@ -154,7 +154,7 @@ export const AutoComplete = ({
 												)}
 											>
 												{isSelected ? <Check className="w-4" /> : null}
-												{option.email}
+												<User user={option} />
 											</CommandItem>
 										);
 									})}
