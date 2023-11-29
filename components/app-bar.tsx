@@ -5,7 +5,6 @@ import { ModeToggle } from "./theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { getServerSession } from "next-auth";
 import { Label } from "./ui/label";
-import { Combobox } from "./combobox";
 import { signOut, useSession } from "next-auth/react";
 import {
 	DropdownMenu,
@@ -41,9 +40,12 @@ import { Button } from "./ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { CreateWorkspace, WorkspaceDetails } from "./profile-menu/workspace";
 import { Workspace } from "@prisma/client";
+import dynamic from "next/dynamic";
+
+const Combobox = dynamic(() => import("@/components/combobox"), { ssr: false });
 
 export function AppBar() {
 	const { data: session } = useSession();

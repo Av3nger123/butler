@@ -51,7 +51,7 @@ export default function Page({
 	const tables = useMemo(() => {
 		let tables: SidebarNavItem[] = [];
 
-		databaseTables?.tables.forEach((database: string) => {
+		databaseTables?.tables?.forEach((database: string) => {
 			tables.push({ name: database });
 		});
 		return tables;

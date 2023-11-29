@@ -58,8 +58,6 @@ async function seedRoles() {
 				createdAt: new Date(),
 			},
 		});
-
-		console.log("Roles seeded successfully");
 	} catch (error) {
 		console.error("Error seeding roles:", error);
 	} finally {

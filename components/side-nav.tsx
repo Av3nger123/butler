@@ -38,7 +38,7 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 	return items?.length ? (
 		<div className="flex">
 			<ScrollArea
-				className="w-fit h-screen overflow-x-hidden overflow-y-auto p-2"
+				className="w-fit h-full overflow-x-hidden overflow-y-auto p-2"
 				style={{ width: `${width / 16}rem` }}
 			>
 				{items.map((item, index) => (

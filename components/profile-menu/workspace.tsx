@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, ChevronDownIcon, Delete, Plus, Trash } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -36,9 +38,19 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "../ui/badge";
 import { User } from "../user";
 import { debounce } from "lodash";
+import { AutoComplete } from "../auto-complete";
 
-export function WorkspaceDetails({ workspace }: { workspace: any }) {
-	const [email, setEmail] = useState("");
+export type User = {
+	id: string;
+	name: string;
+	email: string;
+	emailVerified: Date;
+	image: string;
+	username: string;
+};
+
+export function WorkspaceDetails({ workspace }: Readonly<{ workspace: any }>) {
+	const [user, setUser] = useState<User | null>();
 
 	const { data } = useQuery({
 		queryKey: ["workspace", workspace?.id],
@@ -52,13 +64,6 @@ export function WorkspaceDetails({ workspace }: { workspace: any }) {
 		queryKey: ["roles"],
 		queryFn: () => {
 			return getApi(`/api/roles`);
-		},
-	});
-
-	const { data: usersData } = useQuery({
-		queryKey: ["users", email],
-		queryFn: () => {
-			return getApi(`/api/users?email=${email}`);
 		},
 	});
 
@@ -92,7 +97,7 @@ export function WorkspaceDetails({ workspace }: { workspace: any }) {
 							Invite your team members to collaborate.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="grid gap-6 overflow-y-auto">
+					<CardContent className="grid gap-6 overflow-y-auto h-52 items-start">
 						{data?.workspace?.WorkspaceUser?.map((workspaceUser: any) => {
 							return (
 								<div
@@ -155,37 +160,16 @@ export function WorkspaceDetails({ workspace }: { workspace: any }) {
 					</CardContent>
 				</Card>
 				<div className="w-full grid grid-cols-4 gap-3 items-start row-span-1">
-					<Command className="rounded-lg border shadow-md col-span-3">
-						<CommandInput
-							placeholder="Type an email or search..."
-							value={email}
-							onChangeCapture={(e) => {
-								setEmail(e.currentTarget.value);
-							}}
+					<div className="w-full col-span-3">
+						<AutoComplete
+							emptyMessage="No users found"
+							placeholder="Type email to search users..."
+							value={user ?? undefined}
+							onValueChange={(val) => setUser(val)}
 						/>
-						<CommandList>
-							{usersData?.users?.length === 0 && (
-								<CommandEmpty>No results found.</CommandEmpty>
-							)}
-							{usersData?.users?.length > 0 && (
-								<CommandGroup heading="User Suggestions">
-									{usersData?.users.map((user: any) => (
-										<CommandItem key={user.email}>
-											<div
-												onClick={() => {
-													console.log("click event");
-													setEmail(user.email);
-												}}
-											>
-												<User user={user} />
-											</div>
-										</CommandItem>
-									))}
-								</CommandGroup>
-							)}
-						</CommandList>
-					</Command>
-					<Button>Invite</Button>
+					</div>
+
+					<Button>Add</Button>
 				</div>
 			</DialogContent>
 		</Dialog>

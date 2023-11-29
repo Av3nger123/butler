@@ -3,11 +3,13 @@
 import { Schema } from "@/types";
 import { Popover, PopoverTrigger } from "./ui/popover";
 import { useEffect, useMemo, useState } from "react";
-import { Combobox } from "./combobox";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import useFilterStore from "@/lib/store/filterstore";
 import { Plus, X } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const Combobox = dynamic(() => import("@/components/combobox"), { ssr: false });
 
 type Operator = {
 	value: String;
