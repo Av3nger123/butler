@@ -28,6 +28,8 @@ import {
 import { decrypt, encrypt } from "@/lib/utils";
 import { postApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
+import useUserStore from "@/lib/store/userstore";
+import { useToast } from "./ui/use-toast";
 
 const databaseSchema = z.object({
 	name: z.string().min(2, {
@@ -64,6 +66,8 @@ export function DatabaseForm({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseFormProps>) {
+	const { toast } = useToast();
+	const permissions = useUserStore((state) => state.permissions);
 	const workspace = useWorkspaceStore((state) => state.workspace);
 	const form = useForm<z.infer<typeof databaseSchema>>({
 		resolver: zodResolver(databaseSchema),
@@ -80,14 +84,24 @@ export function DatabaseForm({
 	});
 
 	async function onSubmit(values: z.infer<typeof databaseSchema>) {
-		let request: any = { ...values };
-		if (databaseCluster) {
-			request["id"] = databaseCluster?.id;
+		if (
+			!permissions.includes("add-cluster") &&
+			!permissions.includes("add-cluster")
+		) {
+			toast({
+				title: "Permission Denied",
+				description: "You are not authorized to add/edit the cluster",
+			});
+		} else {
+			let request: any = { ...values };
+			if (databaseCluster) {
+				request["id"] = databaseCluster?.id;
+			}
+			request["workspace_id"] = workspace?.id;
+			request["password"] = encrypt(values.password);
+			const response = await postApi("/api/clusters", JSON.stringify(request));
+			refetch();
 		}
-		request["workspace_id"] = workspace?.id;
-		request["password"] = encrypt(values.password);
-		const response = await postApi("/api/clusters", JSON.stringify(request));
-		refetch();
 	}
 	return (
 		<FormProvider {...form}>

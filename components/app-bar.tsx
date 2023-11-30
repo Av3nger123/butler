@@ -36,6 +36,7 @@ import {
 	UserPlus,
 	Users,
 } from "lucide-react";
+import _ from "lodash";
 import { Button } from "./ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "@/lib/api";
@@ -61,7 +62,7 @@ export function AppBar() {
 		queryKey: ["workspaces"],
 		queryFn: async () => {
 			let res = await getApi("/api/workspaces");
-			if (workspace == {}) setWorkspace(res?.workspaces[0]);
+			if (_.isEmpty(workspace)) setWorkspace(res?.workspaces[0]);
 			return res;
 		},
 	});
