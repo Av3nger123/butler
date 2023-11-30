@@ -31,7 +31,7 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
-import { getApi, postApi } from "@/lib/api";
+import { deleteApi, getApi, postApi } from "@/lib/api";
 import { json } from "stream/consumers";
 import { Workspace } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
@@ -39,6 +39,8 @@ import { Badge } from "../ui/badge";
 import { User } from "../user";
 import { debounce } from "lodash";
 import { AutoComplete } from "../auto-complete";
+import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 
 export type User = {
 	id: string;
@@ -50,9 +52,10 @@ export type User = {
 };
 
 export function WorkspaceDetails({ workspace }: Readonly<{ workspace: any }>) {
+	const { data: session } = useSession();
 	const [user, setUser] = useState<User | null>();
 
-	const { data } = useQuery({
+	const { data, refetch } = useQuery({
 		queryKey: ["workspace", workspace?.id],
 		queryFn: () => {
 			return getApi(`/api/workspaces/${workspace?.id}`);
@@ -66,6 +69,39 @@ export function WorkspaceDetails({ workspace }: Readonly<{ workspace: any }>) {
 			return getApi(`/api/roles`);
 		},
 	});
+
+	async function handleAddUser() {
+		await postApi(
+			`/api/workspaces/${workspace?.id}`,
+			JSON.stringify({
+				userId: user?.id,
+				roleId: "member",
+			})
+		);
+		refetch();
+	}
+
+	async function handleUserRole(userId: string, roleId: string) {
+		await postApi(
+			`/api/workspaces/${workspace?.id}`,
+			JSON.stringify({
+				userId,
+				roleId,
+			})
+		);
+		refetch();
+	}
+
+	async function handleDeleteUser(userId: string, roleId: string) {
+		await deleteApi(
+			`/api/workspaces/${workspace?.id}`,
+			JSON.stringify({
+				userId: userId,
+				roleId: roleId,
+			})
+		);
+		refetch();
+	}
 
 	return (
 		<Dialog>
@@ -97,11 +133,11 @@ export function WorkspaceDetails({ workspace }: Readonly<{ workspace: any }>) {
 							Invite your team members to collaborate.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="grid gap-6 overflow-y-auto h-52 items-start">
+					<CardContent className="flex flex-col gap-4 overflow-y-auto h-52 items-start">
 						{data?.workspace?.WorkspaceUser?.map((workspaceUser: any) => {
 							return (
 								<div
-									className="flex items-center justify-start gap-4"
+									className="flex items-center justify-between gap-4 w-full"
 									key={workspaceUser?.user_id}
 								>
 									<div className="flex items-center space-x-4">
@@ -123,54 +159,80 @@ export function WorkspaceDetails({ workspace }: Readonly<{ workspace: any }>) {
 											</p>
 										</div>
 									</div>
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button variant="outline">
-												{workspaceUser?.role?.label}
-												<ChevronDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
+									<div className="flex items-center justify-start space-x-4">
+										<Popover>
+											<PopoverTrigger asChild>
+												<Button
+													variant="outline"
+													disabled={
+														workspaceUser?.user?.email === session?.user?.email
+													}
+												>
+													{workspaceUser?.role?.label}
+													<ChevronDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="p-0" align="end">
+												<Command>
+													<CommandInput placeholder="Select new role..." />
+													<CommandList>
+														<CommandEmpty>No roles found.</CommandEmpty>
+														<CommandGroup>
+															{rolesData?.roles?.map((role: any) => {
+																return (
+																	<div
+																		key={role?.id}
+																		onClick={() =>
+																			handleUserRole(
+																				workspaceUser?.user_id,
+																				role?.id
+																			)
+																		}
+																	>
+																		<CommandItem className="flex flex-col items-start px-4 py-2">
+																			<p>{role?.label}</p>
+																		</CommandItem>
+																	</div>
+																);
+															})}
+														</CommandGroup>
+													</CommandList>
+												</Command>
+											</PopoverContent>
+										</Popover>
+										{workspaceUser?.user?.email !== session?.user?.email && (
+											<Button
+												variant={"ghost"}
+												size={"icon"}
+												onClick={() =>
+													handleDeleteUser(
+														workspaceUser?.user_id,
+														workspaceUser?.role_id
+													)
+												}
+											>
+												<Trash className="h-4 w-4" />
 											</Button>
-										</PopoverTrigger>
-										<PopoverContent className="p-0" align="end">
-											<Command>
-												<CommandInput placeholder="Select new role..." />
-												<CommandList>
-													<CommandEmpty>No roles found.</CommandEmpty>
-													<CommandGroup>
-														{rolesData?.roles?.map((role: any) => {
-															return (
-																<CommandItem
-																	key={role?.id}
-																	className="flex flex-col items-start px-4 py-2"
-																>
-																	<p>{role?.label}</p>
-																</CommandItem>
-															);
-														})}
-													</CommandGroup>
-												</CommandList>
-											</Command>
-										</PopoverContent>
-									</Popover>
-									<Button variant={"ghost"} size={"icon"}>
-										<Trash className="h-4 w-4" />
-									</Button>
+										)}
+									</div>
 								</div>
 							);
 						})}
 					</CardContent>
 				</Card>
-				<div className="w-full grid grid-cols-4 gap-3 items-start row-span-1">
-					<div className="w-full col-span-3">
-						<AutoComplete
-							emptyMessage="No users found"
-							placeholder="Type email to search users..."
-							value={user ?? undefined}
-							onValueChange={(val) => setUser(val)}
-						/>
+				{workspace?.name !== "My Workspace" && (
+					<div className="w-full grid grid-cols-4 gap-3 items-start row-span-1">
+						<div className="w-full col-span-3">
+							<AutoComplete
+								emptyMessage="No users found"
+								placeholder="Type email to search users..."
+								value={user ?? undefined}
+								onValueChange={(val) => setUser(val)}
+							/>
+						</div>
+						<Button onClick={handleAddUser}>Add</Button>
 					</div>
-
-					<Button>Add</Button>
-				</div>
+				)}
 			</DialogContent>
 		</Dialog>
 	);

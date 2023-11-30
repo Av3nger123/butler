@@ -33,3 +33,46 @@ export async function GET(
 
 	return Response.json({ workspace });
 }
+
+export async function POST(
+	request: NextRequest,
+	{ params }: { params: { workspaceId: string } }
+) {
+	const session = await getServerSession(authOptions);
+	const requestBody = await request.json();
+	const workspace = await prisma.workspaceUser.upsert({
+		where: {
+			workspace_id_user_id: {
+				workspace_id: parseInt(params.workspaceId),
+				user_id: requestBody.userId,
+			},
+		},
+		update: {
+			role_id: requestBody.roleId,
+			user_id: requestBody.userId,
+		},
+		create: {
+			workspace_id: parseInt(params.workspaceId),
+			role_id: requestBody.roleId,
+			user_id: requestBody.userId,
+		},
+	});
+	return Response.json({ workspace });
+}
+
+export async function DELETE(
+	request: NextRequest,
+	{ params }: { params: { workspaceId: string } }
+) {
+	const session = await getServerSession(authOptions);
+	const requestBody = await request.json();
+	const workspace = await prisma.workspaceUser.delete({
+		where: {
+			workspace_id_user_id: {
+				workspace_id: parseInt(params.workspaceId),
+				user_id: requestBody.userId,
+			},
+		},
+	});
+	return Response.json({ workspace });
+}

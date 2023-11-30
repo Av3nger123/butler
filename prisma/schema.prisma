@@ -55,7 +55,7 @@ model WorkspaceUser {
     user         User      @relation(fields: [user_id], references: [id])
     workspace    Workspace @relation(fields: [workspace_id], references: [id])
 
-    @@id([workspace_id, user_id, role_id])
+    @@unique([workspace_id, user_id])
     @@map("workspaceusers")
 }
 

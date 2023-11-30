@@ -11,17 +11,19 @@ import {
 } from "./ui/command";
 import { cn } from "@/lib/utils";
 
-const Combobox: React.FC = ({
-	items,
-	value,
-	onChange,
-	type,
-}: Readonly<{
+interface ComboboxProps {
 	items: any[];
 	value: any;
 	onChange: any;
 	type: string;
-}>) => {
+}
+
+const Combobox: React.FC<ComboboxProps> = ({
+	items,
+	value,
+	onChange,
+	type,
+}) => {
 	const [open, setOpen] = useState<boolean>(false);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

@@ -7,6 +7,7 @@ import { Inter as FontSans } from "next/font/google";
 import Provider from "./client-provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { Toaster } from "@/components/ui/toaster";
 
 export const fontSans = FontSans({
 	subsets: ["latin"],
@@ -37,6 +38,7 @@ export default async function RootLayout({
 				>
 					<Provider session={session}>{children}</Provider>
 				</ThemeProvider>
+				<Toaster />
 			</body>
 		</html>
 	);

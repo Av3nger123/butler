@@ -50,6 +50,8 @@ import { Database } from "@/types";
 import { Skeleton } from "./ui/skeleton";
 import { deleteApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
+import useUserStore from "@/lib/store/userstore";
+import { useToast } from "./ui/use-toast";
 
 interface DatabaseCardProps {
 	databaseCluster: Database;
@@ -67,9 +69,18 @@ export function DatabaseCard({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseCardProps>) {
+	const { toast } = useToast();
+	const permissions = useUserStore((state) => state.permissions);
 	const { cluster, setCluster } = useClusterStore();
 	async function handleDelete() {
-		await deleteApi(`/api/clusters/${databaseCluster.id}`);
+		if (!permissions.includes("delete-cluster")) {
+			toast({
+				title: "Permission denied",
+				description: "You are not authorized to delete this cluster",
+			});
+			return;
+		}
+		await deleteApi(`/api/clusters/${databaseCluster.id}`, "");
 		refetch();
 	}
 

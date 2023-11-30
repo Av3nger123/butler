@@ -1,9 +1,5 @@
-// store.js
 import { StateCreator, create } from "zustand";
-import { StorageValue, createJSONStorage, persist } from "zustand/middleware";
-import { encrypt, decrypt } from "@/lib/utils";
-import { Database } from "@/types";
-import { Workspaces } from "@prisma/client";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface WorkspaceStoreState {
 	workspace: any | null;

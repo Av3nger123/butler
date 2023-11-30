@@ -44,11 +44,13 @@ import { Suspense, useMemo } from "react";
 import { CreateWorkspace, WorkspaceDetails } from "./profile-menu/workspace";
 import { Workspace } from "@prisma/client";
 import dynamic from "next/dynamic";
+import useUserStore from "@/lib/store/userstore";
 
 const Combobox = dynamic(() => import("@/components/combobox"), { ssr: false });
 
 export function AppBar() {
 	const { data: session } = useSession();
+	const setUser = useUserStore((state) => state.setUser);
 
 	const [workspace, setWorkspace] = useWorkspaceStore((state) => [
 		state.workspace,
@@ -59,7 +61,32 @@ export function AppBar() {
 		queryKey: ["workspaces"],
 		queryFn: async () => {
 			let res = await getApi("/api/workspaces");
-			setWorkspace(res?.workspaces[0]);
+			if (workspace == {}) setWorkspace(res?.workspaces[0]);
+			return res;
+		},
+	});
+
+	const { data: user } = useQuery({
+		queryKey: ["user", workspace?.id],
+		queryFn: async () => {
+			let res = await getApi(`/api/users/${session?.user?.email}`);
+			let user = res?.user;
+			let permissions = user?.WorkspaceUser.filter(
+				(workspaceUser: any) => workspaceUser?.workspace_id == workspace?.id
+			)[0]?.role?.RolePermissions?.map(
+				(rolePermission: any) => rolePermission?.permissionId
+			);
+			setUser(
+				{
+					email: user?.email,
+					emailVerified: user?.emailVerified,
+					id: user?.id,
+					image: user?.image,
+					name: user?.name,
+					username: user?.username,
+				},
+				permissions
+			);
 			return res;
 		},
 	});
