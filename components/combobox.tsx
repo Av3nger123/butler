@@ -44,7 +44,7 @@ const Combobox: React.FC<ComboboxProps> = ({
 				<Command>
 					<CommandInput placeholder={`Search ${type}...`} />
 					<CommandEmpty>No {type} found.</CommandEmpty>
-					<CommandGroup className="overflow-y-auto h-96">
+					<CommandGroup className="overflow-y-auto min-h-fit max-h-96">
 						{items.map((item) => (
 							<CommandItem
 								key={item?.value}

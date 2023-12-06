@@ -38,6 +38,8 @@ interface DataTableProps<TData, TValue> {
 	count: number;
 	setPagination: Dispatch<SetStateAction<PaginationState>>;
 	sorting: SortingState;
+	rowSelection: any;
+	setRowSelection: any;
 	setSorting: OnChangeFn<SortingState>;
 }
 
@@ -50,6 +52,8 @@ export function DataTable<TData, TValue>({
 	setPagination,
 	sorting,
 	setSorting,
+	rowSelection,
+	setRowSelection,
 	count,
 }: Readonly<DataTableProps<TData, TValue>>) {
 	const pagination = React.useMemo(
@@ -67,8 +71,11 @@ export function DataTable<TData, TValue>({
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		manualPagination: true,
+
 		manualSorting: true,
 		pageCount: count,
+		enableRowSelection: true,
+		onRowSelectionChange: setRowSelection,
 		onPaginationChange: setPagination,
 		getSortedRowModel: getSortedRowModel(),
 		onColumnFiltersChange: setColumnFilters,
@@ -77,6 +84,7 @@ export function DataTable<TData, TValue>({
 			pagination,
 			sorting,
 			columnFilters,
+			rowSelection,
 		},
 	});
 
@@ -102,7 +110,7 @@ export function DataTable<TData, TValue>({
 							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => {
 									return (
-										<TableHead key={header.id}>
+										<TableHead key={header.id} className="border">
 											{header.isPlaceholder
 												? null
 												: flexRender(
@@ -123,7 +131,10 @@ export function DataTable<TData, TValue>({
 									data-state={row.getIsSelected() && "selected"}
 								>
 									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id} className="whitespace-nowrap">
+										<TableCell
+											key={cell.id}
+											className="whitespace-nowrap border"
+										>
 											{flexRender(
 												cell.column.columnDef.cell,
 												cell.getContext()

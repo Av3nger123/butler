@@ -6,7 +6,7 @@ import { getApi, postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
 import { decrypt } from "@/lib/utils";
 import { Schema } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { dataColumns } from "./data-columns";
 import { PaginationState, SortingState } from "@tanstack/react-table";
@@ -23,9 +23,10 @@ export default function Page({
 	params: { clusterId: string; tableId: string; databaseId: string };
 }) {
 	const { cluster } = useClusterStore();
+	const filters = useFilterStore((state) => state.filters);
+	const [rowSelection, setRowSelection] = useState({});
 	const [sorting, setSorting] = useState<SortingState>([]);
 
-	const filters = useFilterStore((state) => state.filters);
 	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
 		pageSize: 10,
@@ -60,7 +61,7 @@ export default function Page({
 
 	const {
 		data: tableData,
-		isLoading,
+		isFetching,
 		refetch,
 	} = useQuery({
 		queryKey: [
@@ -104,6 +105,7 @@ export default function Page({
 			}
 		},
 		enabled: !!cluster,
+		placeholderData: keepPreviousData,
 	});
 
 	const schemas = useMemo(() => {
@@ -163,6 +165,8 @@ export default function Page({
 						pageIndex={pageIndex}
 						pageSize={pageSize}
 						sorting={sorting}
+						rowSelection={rowSelection}
+						setRowSelection={setRowSelection}
 						setSorting={setSorting}
 						setPagination={setPagination}
 						count={Math.ceil(tableData?.count / pageSize)}

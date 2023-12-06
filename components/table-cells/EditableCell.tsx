@@ -40,7 +40,7 @@ export function EditableCell({
 		<input
 			value={value ?? ""}
 			className={`${
-				has(dataDiff, key) ? "bg-orange-300" : "bg-transparent"
+				has(dataDiff, key) ? "bg-orange-300" : "bg-transparent "
 			} border-none p-2 rounded outline-current`}
 			onChange={(e) => setValue(e.target.value)}
 			type="text"

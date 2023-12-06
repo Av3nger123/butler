@@ -57,8 +57,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="column">Column Name</Label>
 								<Input
 									id="column"
-									defaultValue={schema?.column}
-									disabled
+									value={schema?.column}
 									className="col-span-2 h-8"
 								/>
 							</div>
@@ -66,8 +65,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="columnDef">Column Default</Label>
 								<Input
 									id="columnDef"
-									defaultValue={schema?.columnDefault}
-									disabled
+									value={schema?.columnDefault}
 									className="col-span-2 h-8"
 								/>
 							</div>
@@ -75,8 +73,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="dataType">Data Type</Label>
 								<Input
 									id="dataType"
-									defaultValue={schema?.dataType}
-									disabled
+									value={schema?.dataType}
 									className="col-span-2 h-8"
 								/>
 							</div>
@@ -84,8 +81,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="fk">Foreign Key</Label>
 								<Input
 									id="fk"
-									defaultValue={schema?.foreignKey}
-									disabled
+									value={schema?.foreignKey}
 									className="col-span-2 h-8"
 								/>
 							</div>
@@ -93,8 +89,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="pk">Is Primary</Label>
 								<Input
 									id="pk"
-									defaultValue={String(schema?.isPrimary)}
-									disabled
+									value={String(schema?.isPrimary)}
 									className="col-span-2 h-8"
 								/>
 							</div>
@@ -102,8 +97,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="idx">Index</Label>
 								<Input
 									id="idx"
-									defaultValue={String(schema?.index)}
-									disabled
+									value={String(schema?.index)}
 									className="col-span-2 h-8"
 								/>
 							</div>
@@ -111,8 +105,7 @@ export function DataTableColumnHeader<TData, TValue>({
 								<Label htmlFor="isNull">Is Nullable</Label>
 								<Input
 									id="isNull"
-									defaultValue={schema?.isNullable}
-									disabled
+									value={schema?.isNullable}
 									className="col-span-2 h-8"
 								/>
 							</div>
