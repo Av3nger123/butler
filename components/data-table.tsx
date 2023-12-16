@@ -1,14 +1,9 @@
 "use client";
 import {
-	ColumnDef,
 	ColumnFiltersState,
-	OnChangeFn,
-	PaginationState,
-	SortingState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
-	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
@@ -22,40 +17,34 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { Button } from "./ui/button";
+import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { DataTablePagination } from "./table-pagination";
 import { DataTableViewOptions } from "./column-toggle";
-import { usePathname } from "next/navigation";
+import { useTable } from "@/lib/context/table-context";
+import useDataStore from "@/lib/store/datastore";
+import { has } from "lodash";
 
 interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
 	filterColumn: string | null;
-	pageIndex: number;
-	pageSize: number;
-	count: number;
-	setPagination: Dispatch<SetStateAction<PaginationState>>;
-	sorting: SortingState;
-	rowSelection: any;
-	setRowSelection: any;
-	setSorting: OnChangeFn<SortingState>;
 }
 
 export function DataTable<TData, TValue>({
-	columns,
-	data,
 	filterColumn,
-	pageIndex,
-	pageSize,
-	setPagination,
-	sorting,
-	setSorting,
-	rowSelection,
-	setRowSelection,
-	count,
 }: Readonly<DataTableProps<TData, TValue>>) {
+	const { dataDiff } = useDataStore((state) => state.dataDiff);
+	const {
+		pageIndex,
+		pageSize,
+		data,
+		columns,
+		setSorting,
+		count,
+		setRowSelection,
+		setPagination,
+		sorting,
+		rowSelection,
+	} = useTable();
 	const pagination = React.useMemo(
 		() => ({
 			pageIndex,
@@ -71,7 +60,6 @@ export function DataTable<TData, TValue>({
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		manualPagination: true,
-
 		manualSorting: true,
 		pageCount: count,
 		enableRowSelection: true,

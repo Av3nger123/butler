@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/column-header";
-import { EditableCell } from "@/components/table-cells/EditableCell";
+import { EditableCell } from "@/components/table-cells/editable-cell";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Schema } from "@/types";
 import { Column, ColumnDef } from "@tanstack/react-table";
