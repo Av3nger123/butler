@@ -60,7 +60,7 @@ export function EditableCell({
 					: "border-none"
 			)}
 			onChange={onChange}
-			type={columnProps["dataType"]}
+			type={columnProps && columnProps["dataType"]}
 		/>
 	);
 }

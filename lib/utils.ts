@@ -74,6 +74,9 @@ export function generateQuery(
 	primaryKey: string
 ) {
 	let arr: string[] = [];
+	if (!diffObject) {
+		return "";
+	}
 	Object.keys(diffObject).forEach((operation) => {
 		if (!isEmpty(diffObject[operation])) {
 			Object.keys(diffObject[operation]).forEach((pk) => {
