@@ -29,6 +29,6 @@ const DynamicInput = ({
 			/>
 		),
 	};
-	return <div className={className}>{componentsMap[type.slice(0, 3)]}</div>;
+	return <div className={className}>{componentsMap[type?.slice(0, 3)]}</div>;
 };
 export { DynamicInput };

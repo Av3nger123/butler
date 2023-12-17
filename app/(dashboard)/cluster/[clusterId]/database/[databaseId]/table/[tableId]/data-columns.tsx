@@ -1,8 +1,10 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/column-header";
+import { CustomCheck } from "@/components/table-cells/custom-check";
 import { EditableCell } from "@/components/table-cells/editable-cell";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTable } from "@/lib/context/table-context";
 import { Schema } from "@/types";
 import { Column, ColumnDef } from "@tanstack/react-table";
 
@@ -24,14 +26,7 @@ export function dataColumns(
 				aria-label="Select all"
 			/>
 		),
-		cell: ({ row }) => (
-			<Checkbox
-				className="mx-2"
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label="Select row"
-			/>
-		),
+		cell: CustomCheck,
 		enableSorting: false,
 		enableHiding: false,
 	});

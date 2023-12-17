@@ -20,17 +20,20 @@ import { ReactNode } from "react";
 import { getApi, postApi } from "../api";
 import useClusterStore from "../store/clusterstore";
 import { Schema } from "@/types";
-import { decrypt } from "../utils";
+import { decrypt, defaultRow, getPrimaryKey } from "../utils";
 import useFilterStore from "../store/filterstore";
-import { has } from "lodash";
+import { has, isEmpty } from "lodash";
 import { dataColumns } from "@/app/(dashboard)/cluster/[clusterId]/database/[databaseId]/table/[tableId]/data-columns";
+import useDataStore from "../store/datastore";
 
 interface TableContextType {
 	clusterId: string;
 	pkFormat: string;
 	tableId: string;
 	databaseId: string;
+	defaultPrimaryKey: string;
 	key: string;
+	selectedIds: string[];
 	refetch: () => void;
 	schemas: any;
 	data: any[];
@@ -52,6 +55,8 @@ const initialTableContext: TableContextType = {
 	tableId: "",
 	pkFormat: "",
 	databaseId: "",
+	selectedIds: [],
+	defaultPrimaryKey: "",
 	refetch: () => {},
 	schemas: {},
 	data: [],
@@ -88,8 +93,11 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	databaseId,
 }) => {
 	const { cluster } = useClusterStore();
+	const dataDiff = useDataStore((state) => state.dataDiff);
 	const filters = useFilterStore((state) => state.filters);
 	const [rowSelection, setRowSelection] = useState({});
+	const [selectedIndex, setSelectedIndex] = useState({});
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [data, setData] = useState<any>([]);
 	const [pk, setPk] = useState<string>("");
@@ -98,6 +106,25 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		pageSize: 10,
 	});
 
+	useEffect(() => {
+		Object.keys(rowSelection).forEach((value) => {
+			let val = parseInt(value);
+			let final = val + pageSize * pageIndex;
+			setSelectedIndex((prev) => ({ ...prev, [final]: true }));
+		});
+	}, [rowSelection]);
+
+	useEffect(() => {
+		let finalState: any = {};
+		Object.keys(selectedIndex).forEach((value) => {
+			let val = parseInt(value);
+			let final = val - pageSize * pageIndex;
+			if (final > 0 && final < pageSize) {
+				finalState[final] = true;
+			}
+			setRowSelection(finalState);
+		});
+	}, [pageIndex, pageSize]);
 	const { data: queryData } = useQuery({
 		queryKey: ["queries", clusterId, databaseId, tableId],
 		queryFn: async () => {
@@ -174,6 +201,14 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		placeholderData: keepPreviousData,
 	});
 
+	useEffect(() => {
+		let keys: string[] = [];
+		Object.keys(rowSelection).forEach((value) => {
+			keys.push(data[parseInt(value)]?.primaryKey);
+		});
+		setSelectedIds(keys);
+	}, [rowSelection, data]);
+
 	const schemas = useMemo(() => {
 		let schemas: { [key: string]: Schema } = {};
 		let pk: string[] = [];
@@ -206,33 +241,41 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		return schemas;
 	}, [schemaData]);
 
+	const key = useMemo(() => {
+		return `${clusterId}~${databaseId}~${tableId}`;
+	}, [clusterId, databaseId, tableId]);
+
 	useEffect(() => {
 		let data: any[] = [];
 		if (tableData) {
 			tableData?.data?.forEach((row: any) => {
 				data.push({
 					...row,
+					primaryKey: getPrimaryKey(pk, row),
 				});
 			});
 		}
+		if (has(dataDiff, key) && !isEmpty(dataDiff[key]["add"])) {
+			let newRows = Object.values(dataDiff[key]["add"]);
+			data = newRows.concat(data);
+		}
 		setData(data);
-	}, [tableData]);
+	}, [dataDiff, key, pk, tableData]);
 
-	const key = useMemo(() => {
-		return `${clusterId}~${databaseId}~${tableId}`;
-	}, [clusterId, databaseId, tableId]);
-
-	const pkFormat = useMemo(() => {
-		return `${clusterId}~${databaseId}~${tableId}`;
-	}, [schemas]);
+	const defaultPrimaryKey = useMemo(() => {
+		let defaultRowVal = defaultRow?.(schemas);
+		return getPrimaryKey(pk, defaultRowVal);
+	}, [pk, schemas]);
 
 	const value: TableContextType = useMemo(() => {
 		if (data && schemas) {
-			let cols = dataColumns(Object.keys(data[0] ?? {}), schemas);
+			let cols = dataColumns(Object.keys(tableData?.data[0] ?? {}), schemas);
 			return {
+				selectedIds,
 				pkFormat: pk,
 				clusterId,
 				tableId,
+				defaultPrimaryKey,
 				databaseId,
 				key: key,
 				refetch,
@@ -255,6 +298,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		clusterId,
 		data,
 		databaseId,
+		defaultPrimaryKey,
 		key,
 		pageIndex,
 		pageSize,
@@ -262,8 +306,10 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		refetch,
 		rowSelection,
 		schemas,
+		selectedIds,
 		sorting,
 		tableData?.count,
+		tableData?.data,
 		tableId,
 	]);
 
