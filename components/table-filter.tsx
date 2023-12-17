@@ -80,7 +80,7 @@ export function TableFilter({
 				/>
 			</div>
 			<Input
-				className="col-span-6"
+				className="col-span-6 bg-white dark:bg-black"
 				type="text"
 				value={filters[path][index]["value"] ?? ""}
 				onChange={(e) => setValue(path, index, e.target.value)}
@@ -92,7 +92,7 @@ export function TableFilter({
 				className="col-span-1 ml-2"
 				onClick={() => clearFilter(path, index)}
 			>
-				<X className="mr-2 w-4 h-4" /> Delete
+				<X className="mr-2 w-6 h-6" /> Delete
 			</Button>
 		</div>
 	);

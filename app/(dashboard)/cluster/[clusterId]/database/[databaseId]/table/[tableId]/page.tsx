@@ -2,9 +2,16 @@
 import DataTable from "@/components/data-table";
 import { Commits } from "@/components/commits";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TableToolbar } from "@/components/table-toolbar";
-import { Filters } from "./filters";
 import { TableContextProvider } from "@/lib/context/table-context";
+import dynamic from "next/dynamic";
+
+const TableToolbarNoSSR = dynamic(() => import("@/components/table-toolbar"), {
+	ssr: false,
+});
+
+const FiltersNoSSR = dynamic(() => import("@/components/filters"), {
+	ssr: false,
+});
 
 export default function Page({
 	params,
@@ -24,8 +31,8 @@ export default function Page({
 						<TabsTrigger value="commits">Commits</TabsTrigger>
 					</TabsList>
 					<TabsContent value="data">
-						<TableToolbar />
-						<Filters />
+						<TableToolbarNoSSR />
+						<FiltersNoSSR />
 						<DataTable filterColumn={null} />
 					</TabsContent>
 					<TabsContent value="commits">

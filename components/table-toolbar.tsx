@@ -22,7 +22,7 @@ import useDataStore from "@/lib/store/datastore";
 import { defaultRow, generateQuery } from "@/lib/utils";
 import { SQLEditor } from "./sql-editor";
 
-export function TableToolbar() {
+const TableToolbar: React.FC = () => {
 	const { filters, addFilter, clear } = useFilterStore();
 	const [dataDiff, setDataDiffRow, clearDataDiff, deleteDataDiff] =
 		useDataStore((state) => [
@@ -44,11 +44,7 @@ export function TableToolbar() {
 		<div className="flex items-center justify-center mb-1 gap-1 rounded-sm p-1">
 			<Button variant="secondary" onClick={() => refetch()}>
 				<Play className="mr-2 h-4 w-4 opacity-70" />{" "}
-				{typeof window !== "undefined"
-					? has(filters, path) && filters[path].length > 0
-						? "Execute"
-						: "Refetch"
-					: "Refetch"}
+				{has(filters, path) && filters[path].length > 0 ? "Execute" : "Refetch"}
 			</Button>
 			<Popover>
 				<PopoverTrigger asChild>
@@ -112,4 +108,5 @@ export function TableToolbar() {
 			</Button>
 		</div>
 	);
-}
+};
+export default TableToolbar;
