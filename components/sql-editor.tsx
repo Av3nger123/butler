@@ -18,7 +18,7 @@ export function SQLEditor({ code, setCode }: { code: string; setCode: any }) {
 				style={{
 					fontSize: 18,
 					height: "100%",
-					backgroundColor: `${theme == "dark" ? "#020817" : "#ffffff"}`,
+					backgroundColor: `${theme == "light" ? "#ffffff" : "#020817"}`,
 					fontFamily:
 						"ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
 				}}
