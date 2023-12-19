@@ -23,7 +23,6 @@ import { DataTablePagination } from "./table-pagination";
 import { DataTableViewOptions } from "./column-toggle";
 import { useTable } from "@/lib/context/table-context";
 import useDataStore from "@/lib/store/datastore";
-import { has } from "lodash";
 
 interface DataTableProps<TData, TValue> {
 	filterColumn: string | null;
@@ -32,7 +31,6 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
 	filterColumn,
 }: Readonly<DataTableProps<TData, TValue>>) {
-	const { dataDiff } = useDataStore((state) => state.dataDiff);
 	const {
 		pageIndex,
 		pageSize,
@@ -40,6 +38,7 @@ export function DataTable<TData, TValue>({
 		columns,
 		setSorting,
 		count,
+		key: path,
 		setRowSelection,
 		setPagination,
 		sorting,

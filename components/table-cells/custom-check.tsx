@@ -2,7 +2,7 @@ import { Row } from "@tanstack/react-table";
 import { Checkbox } from "../ui/checkbox";
 import { useTable } from "@/lib/context/table-context";
 
-export function CustomCheck({ row }: { row: Row<any> }) {
+export function CustomCheck({ row }: Readonly<{ row: Row<any> }>) {
 	const { selectedIds } = useTable();
 	return (
 		<Checkbox

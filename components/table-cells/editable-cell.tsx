@@ -75,22 +75,24 @@ export function EditableCell({
 		setValue(initialValue);
 	}, [initialValue]);
 
+	const bgColor: any = useMemo(() => {
+		if (has(dataDiff, `${key}.add.${row.original?.primaryKey}`)) {
+			return "bg-green-400 bg-opacity-25 dark:bg-opacity-70 dark:bg-green-800";
+		}
+		if (
+			has(dataDiff, `${key}.update.${row.original?.primaryKey}.${column.id}`)
+		) {
+			return "bg-yellow-400 bg-opacity-25 dark:bg-opacity-70 dark:bg-yellow-800";
+		}
+		if (has(dataDiff, `${key}.delete.${row.original?.primaryKey}`)) {
+			return "bg-red-400 bg-opacity-25 dark:bg-opacity-70 dark:bg-red-800";
+		}
+	}, [column.id, dataDiff, key, row.original?.primaryKey]);
+
 	return (
 		<DynamicInput
 			value={value ?? ""}
-			className={cn(
-				"rounded outline-current",
-				has(dataDiff, `${key}.delete.${row.original.primaryKey}`)
-					? "border-2  border-red-500"
-					: has(
-							dataDiff,
-							`${key}.${operation}.${row.original.primaryKey}.${column.id}`
-					  )
-					? `border-2 ${
-							operation === "add" ? "border-green-500" : "border-orange-500"
-					  }`
-					: "border-none"
-			)}
+			className={cn("rounded outline-current", bgColor)}
 			onChange={onChange}
 			type={columnProps && columnProps["dataType"]}
 		/>
