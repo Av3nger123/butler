@@ -20,7 +20,7 @@ export default async function DashboardLayout({
 					<AppBar />
 				</div>
 			</header>
-			<div className="container grid flex-1 gap-12">
+			<div className="px-4 grid flex-1 gap-12">
 				<main className="w-full overflow-hidden">{children}</main>
 			</div>
 		</div>

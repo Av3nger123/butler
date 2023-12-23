@@ -1,5 +1,4 @@
 import { ThemeProvider } from "@/components/theme-provider";
-import { firaCode } from "@/components/ui/fonts";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import { SessionProvider } from "next-auth/react";
@@ -8,6 +7,7 @@ import Provider from "./client-provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { Toaster } from "@/components/ui/toaster";
+import { firaCode } from "@/components/ui/fonts";
 
 export const fontSans = FontSans({
 	subsets: ["latin"],
@@ -27,7 +27,7 @@ export default async function RootLayout({
 			<body
 				className={cn(
 					"min-h-screen bg-background font-sans antialiased",
-					fontSans.variable
+					firaCode.className
 				)}
 			>
 				<ThemeProvider

@@ -3,27 +3,22 @@
 import { Commits } from "@/components/commits";
 import { SidebarNav } from "@/components/side-nav";
 import { getApi, postApi } from "@/lib/api";
-import { tables } from "@/lib/placeholder";
 import useClusterStore from "@/lib/store/clusterstore";
 import { decrypt } from "@/lib/utils";
-import { SidebarNavItem, Database } from "@/types";
+import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 export default function Page({
 	params,
-}: {
+}: Readonly<{
 	params: {
 		databaseId: string;
 		clusterId: string;
 	};
-}) {
+}>) {
 	const { cluster } = useClusterStore();
-	const {
-		data: databaseTables,
-		refetch,
-		isLoading,
-	} = useQuery({
+	const { data: databaseTables } = useQuery({
 		queryKey: ["tables", params.clusterId, params.databaseId],
 		queryFn: async () => {
 			if (cluster)
@@ -58,18 +53,16 @@ export default function Page({
 	}, [databaseTables]);
 
 	return (
-		<div className="h-full w-full">
-			<div className="flex flex-row">
-				<div className="border-r w-fit h-full">
-					<SidebarNav
-						type="table"
-						items={tables?.map((element: SidebarNavItem) => ({
-							name: element.name,
-						}))}
-					/>
-				</div>
-				<Commits commits={data?.commits} />
+		<div className="flex flex-row">
+			<div className="border-r w-fit h-full">
+				<SidebarNav
+					type="table"
+					items={tables?.map((element: SidebarNavItem) => ({
+						name: element.name,
+					}))}
+				/>
 			</div>
+			<Commits commits={data?.commits} />
 		</div>
 	);
 }

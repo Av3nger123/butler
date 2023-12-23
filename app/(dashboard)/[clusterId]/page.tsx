@@ -1,12 +1,11 @@
 "use client";
 import { SidebarNav } from "@/components/side-nav";
-import { decrypt, encrypt } from "@/lib/utils";
+import { decrypt } from "@/lib/utils";
 import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
-import { BarLoader } from "react-spinners";
 
 export default function ClusterPage({
 	params,
@@ -17,11 +16,7 @@ export default function ClusterPage({
 }>) {
 	const { cluster } = useClusterStore();
 
-	const {
-		data: clusterDatabases,
-		refetch,
-		isLoading,
-	} = useQuery({
+	const { data: clusterDatabases } = useQuery({
 		queryKey: ["databases", params.clusterId],
 		queryFn: async () => {
 			if (cluster)
@@ -46,8 +41,8 @@ export default function ClusterPage({
 	}, [clusterDatabases]);
 
 	return (
-		<div className="h-full w-full">
-			<div className="border-r w-fit h-full">
+		<div className="flex flex-row">
+			<div className="border-r">
 				<SidebarNav type="database" items={databases} />
 			</div>
 		</div>

@@ -92,10 +92,7 @@ export function DatabaseCard({
 			<CardHeader className="grid grid-cols-[1fr_110px] items-start gap-1 space-y-0">
 				<div className="space-y-1">
 					<CardTitle>
-						<Link
-							href={`/cluster/${databaseCluster.id}`}
-							onClick={handleClusterCLick}
-						>
+						<Link href={`/${databaseCluster.id}`} onClick={handleClusterCLick}>
 							{databaseCluster.name}
 						</Link>
 					</CardTitle>

@@ -16,7 +16,7 @@ export interface SidebarNavProps {
 }
 
 export function SidebarNav({ items, type }: SidebarNavProps) {
-	const [width, setWidth] = useState<number>(200);
+	const [width, setWidth] = useState<number>(250);
 	const isResized = useRef(false);
 	const path = usePathname();
 	const pathname = usePathname();
@@ -26,10 +26,8 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 			if (!isResized.current) {
 				return;
 			}
-
 			setWidth((previousWidth) => previousWidth + e.movementX / 2);
 		});
-
 		window.addEventListener("mouseup", () => {
 			isResized.current = false;
 		});
@@ -38,19 +36,19 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 	return items?.length ? (
 		<div className="flex">
 			<ScrollArea
-				className="w-fit h-full overflow-x-hidden overflow-y-auto p-2"
+				className="w-fit h-[79vh] overflow-x-hidden overflow-y-auto p-2"
 				style={{ width: `${width / 16}rem` }}
 			>
 				{items.map((item, index) => (
 					<Link
-						key={index}
-						href={path + "/" + type + `/${item.name}`}
+						key={item.name}
+						href={path + `/${item.name}`}
 						className="flex items-start"
 					>
 						<div className={cn("pb-1")}>
 							<h4
 								className={cn("flex w-full rounded-md p-2 hover:underline", {
-									"bg-muted": pathname === path + "/" + type + `/${item.name}`,
+									"bg-muted": pathname === path + `/${item.name}`,
 								})}
 							>
 								{item.name}
@@ -68,43 +66,3 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 		</div>
 	) : null;
 }
-
-// interface DocsSidebarNavItemsProps {
-// 	items: SidebarNavItem[];
-// 	pathname: string | null;
-// }
-
-// export function DocsSidebarNavItems({
-// 	items,
-// 	pathname,
-// }: DocsSidebarNavItemsProps) {
-// 	return items?.length ? (
-// 		<div className="grid grid-flow-row auto-rows-max text-sm">
-// 			{items.map((item, index) =>
-// 				!item.disabled && item.href ? (
-// 					<Link
-// 						key={index}
-// 						href={item.href}
-// 						className={cn(
-// 							"flex w-full items-center rounded-md p-2 hover:underline",
-// 							{
-// 								"bg-muted": pathname === item.href,
-// 							}
-// 						)}
-// 						target={item.external ? "_blank" : ""}
-// 						rel={item.external ? "noreferrer" : ""}
-// 					>
-// 						{item.title}
-// 					</Link>
-// 				) : (
-// 					<span
-// 						key={index}
-// 						className="flex w-full cursor-not-allowed items-center rounded-md p-2 opacity-60"
-// 					>
-// 						{item.title}
-// 					</span>
-// 				)
-// 			)}
-// 		</div>
-// 	) : null;
-// }

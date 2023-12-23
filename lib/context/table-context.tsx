@@ -23,8 +23,8 @@ import { Schema } from "@/types";
 import { decrypt, defaultRow, getPrimaryKey } from "../utils";
 import useFilterStore from "../store/filterstore";
 import { has, isEmpty } from "lodash";
-import { dataColumns } from "@/app/(dashboard)/cluster/[clusterId]/database/[databaseId]/table/[tableId]/data-columns";
 import useDataStore from "../store/datastore";
+import { dataColumns } from "@/components/data-columns";
 
 interface TableContextType {
 	clusterId: string;
