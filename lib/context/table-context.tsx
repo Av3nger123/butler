@@ -2,11 +2,9 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
-	ColumnDef,
 	OnChangeFn,
 	PaginationState,
 	SortingState,
-	Table,
 } from "@tanstack/react-table";
 import React, {
 	Dispatch,
@@ -15,8 +13,8 @@ import React, {
 	useEffect,
 	useMemo,
 	useState,
+	ReactNode,
 } from "react";
-import { ReactNode } from "react";
 import { getApi, postApi } from "../api";
 import useClusterStore from "../store/clusterstore";
 import { Schema } from "@/types";
@@ -110,7 +108,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		Object.keys(rowSelection).forEach((value) => {
 			let val = parseInt(value);
 			let final = val + pageSize * pageIndex;
-			setSelectedIndex((prev) => ({ ...prev, [final]: true }));
+			setSelectedIndex((prev) => ({ ...prev, [final]: val }));
 		});
 	}, [rowSelection]);
 
@@ -165,6 +163,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 			pageIndex,
 			pageSize,
 			sorting,
+			filters,
 		],
 		queryFn: async () => {
 			if (cluster) {
@@ -269,7 +268,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 
 	const value: TableContextType = useMemo(() => {
 		if (data && schemas) {
-			let cols = dataColumns(Object.keys(tableData?.data[0] ?? {}), schemas);
+			let cols = dataColumns(schemas);
 			return {
 				selectedIds,
 				pkFormat: pk,

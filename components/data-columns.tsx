@@ -8,10 +8,9 @@ import { useTable } from "@/lib/context/table-context";
 import { Schema } from "@/types";
 import { Column, ColumnDef } from "@tanstack/react-table";
 
-export function dataColumns(
-	keys: string[],
-	schemas: { [key: string]: Schema }
-): ColumnDef<any>[] {
+export function dataColumns(schemas: {
+	[key: string]: Schema;
+}): ColumnDef<any>[] {
 	let result: ColumnDef<any>[] = [];
 	result.push({
 		id: "select",
@@ -30,7 +29,7 @@ export function dataColumns(
 		enableSorting: false,
 		enableHiding: false,
 	});
-	keys.forEach((key) => {
+	Object.keys(schemas).forEach((key) => {
 		result.push({
 			accessorKey: key,
 			header: ({ column }) => (

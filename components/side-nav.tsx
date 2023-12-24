@@ -16,30 +16,13 @@ export interface SidebarNavProps {
 }
 
 export function SidebarNav({ items, type }: SidebarNavProps) {
-	const [width, setWidth] = useState<number>(250);
-	const isResized = useRef(false);
 	const path = usePathname();
 	const pathname = usePathname();
 
-	useEffect(() => {
-		window.addEventListener("mousemove", (e) => {
-			if (!isResized.current) {
-				return;
-			}
-			setWidth((previousWidth) => previousWidth + e.movementX / 2);
-		});
-		window.addEventListener("mouseup", () => {
-			isResized.current = false;
-		});
-	}, []);
-
 	return items?.length ? (
 		<div className="flex">
-			<ScrollArea
-				className="w-fit h-[79vh] overflow-x-hidden overflow-y-auto p-2"
-				style={{ width: `${width / 16}rem` }}
-			>
-				{items.map((item, index) => (
+			<ScrollArea className="w-fit h-[79vh] overflow-x-hidden overflow-y-auto p-2">
+				{items.map((item) => (
 					<Link
 						key={item.name}
 						href={path + `/${item.name}`}
@@ -57,12 +40,6 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 					</Link>
 				))}
 			</ScrollArea>
-			<div
-				onMouseDown={() => {
-					isResized.current = true;
-				}}
-				className="w-px cursor-col-resize select-none"
-			/>
 		</div>
 	) : null;
 }

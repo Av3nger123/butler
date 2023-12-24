@@ -3,49 +3,27 @@
 import Link from "next/link";
 import { ModeToggle } from "./theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { getServerSession } from "next-auth";
 import { Label } from "./ui/label";
 import { signOut, useSession } from "next-auth/react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuPortal,
 	DropdownMenuSeparator,
-	DropdownMenuShortcut,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import {
-	Cloud,
-	CreditCard,
-	Github,
-	Keyboard,
-	LifeBuoy,
-	LogOut,
-	Mail,
-	MessageSquare,
-	Plus,
-	PlusCircle,
-	Settings,
-	User,
-	UserPlus,
-	Users,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import _ from "lodash";
-import { Button } from "./ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
-import { Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import { CreateWorkspace, WorkspaceDetails } from "./profile-menu/workspace";
 import { Workspace } from "@prisma/client";
 import dynamic from "next/dynamic";
 import useUserStore from "@/lib/store/userstore";
+import { redirect } from "next/navigation";
 
 const Combobox = dynamic(() => import("@/components/combobox"), { ssr: false });
 
@@ -102,7 +80,7 @@ export function AppBar() {
 	);
 	return (
 		<div className="w-full grid grid-cols-10 items-center justify-between gap-6 md:gap-10">
-			<div className="col-span-8 flex flex-row gap-2">
+			<div className="col-span-2 flex flex-row gap-2">
 				<Link href="/" className="hidden items-center space-x-2 md:flex">
 					<span className="hidden font-bold sm:inline-block">Butler</span>
 				</Link>
@@ -115,10 +93,12 @@ export function AppBar() {
 								(workspace: Workspace) => workspace.name.toLowerCase() == value
 							)[0]
 						);
+						redirect("/");
 					}}
 					value={workspace?.id}
 				/>
 			</div>
+			<div className="col-span-6" />
 			<div className="flex gap-2 justify-end col-span-2 items-center">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>

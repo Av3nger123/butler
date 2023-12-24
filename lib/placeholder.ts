@@ -1,6 +1,6 @@
 import { Database, SidebarNavItem } from "@/types";
 
-export const databaseClusters: Database[] = [
+export const databaseClusters: DatabaseCluster[] = [
 	{
 		id: "1",
 		name: "Database 1",

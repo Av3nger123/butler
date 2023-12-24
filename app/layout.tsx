@@ -1,18 +1,22 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
-import { SessionProvider } from "next-auth/react";
-import { Inter as FontSans } from "next/font/google";
+import {
+	Fira_Code,
+	Inter as FontSans,
+	Fira_Code as FiraCode,
+} from "next/font/google";
 import Provider from "./client-provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { Toaster } from "@/components/ui/toaster";
-import { firaCode } from "@/components/ui/fonts";
+import { Toaster } from "sonner";
 
 export const fontSans = FontSans({
 	subsets: ["latin"],
 	variable: "--font-sans",
 });
+
+export const firaCode = Fira_Code({ subsets: ["greek"], variable: "--" });
 
 export default async function RootLayout({
 	children,
@@ -38,7 +42,7 @@ export default async function RootLayout({
 				>
 					<Provider session={session}>{children}</Provider>
 				</ThemeProvider>
-				<Toaster />
+				<Toaster position="top-right" closeButton richColors />
 			</body>
 		</html>
 	);

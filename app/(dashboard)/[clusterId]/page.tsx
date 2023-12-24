@@ -6,6 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
+import { useGetDatabases } from "@/hooks/databases";
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@/components/ui/resizable";
 
 export default function ClusterPage({
 	params,
@@ -16,35 +22,24 @@ export default function ClusterPage({
 }>) {
 	const { cluster } = useClusterStore();
 
-	const { data: clusterDatabases } = useQuery({
-		queryKey: ["databases", params.clusterId],
-		queryFn: async () => {
-			if (cluster)
-				return await postApi(
-					"http://localhost:8080/databases",
-					JSON.stringify({
-						...cluster,
-						password: decrypt(cluster.password),
-					})
-				);
-		},
-		enabled: !!cluster,
-	});
+	const { data: ClusterDatabases } = useGetDatabases(cluster);
 
 	const databases = useMemo(() => {
 		let databases: SidebarNavItem[] = [];
 
-		clusterDatabases?.databases.forEach((database: string) => {
+		ClusterDatabases?.databases.forEach((database: string) => {
 			databases.push({ name: database });
 		});
 		return databases;
-	}, [clusterDatabases]);
+	}, [ClusterDatabases]);
 
 	return (
-		<div className="flex flex-row">
-			<div className="border-r">
+		<ResizablePanelGroup direction="horizontal" className="min-h-[79vh] border">
+			<ResizablePanel defaultSize={15}>
 				<SidebarNav type="database" items={databases} />
-			</div>
-		</div>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel defaultSize={85}></ResizablePanel>
+		</ResizablePanelGroup>
 	);
 }

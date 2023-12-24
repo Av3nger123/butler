@@ -32,11 +32,11 @@ const Combobox: React.FC<ComboboxProps> = ({
 					variant="outline"
 					role="combobox"
 					aria-expanded={open}
-					className="w-[200px] justify-between"
+					className="w-full justify-between"
 				>
 					{value
 						? items.find((item) => item.value === value)?.label
-						: `Select ${type} ...`}
+						: `Select ${type}`}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>

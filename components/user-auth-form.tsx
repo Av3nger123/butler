@@ -10,8 +10,8 @@ import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { userAuthSchema } from "@/lib/validations/auth";
 import { buttonVariants } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
 import { Icons } from "@/components/icons";
+import { toast } from "sonner";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -41,17 +41,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 		setIsLoading(false);
 
 		if (!signInResult?.ok) {
-			return toast({
-				title: "Something went wrong.",
-				description: "Your sign in request failed. Please try again.",
-				variant: "destructive",
-			});
+			return toast.error("Your sign in request failed. Please try again.");
 		}
-
-		return toast({
-			title: "Check your email",
-			description: "We sent you a login link. Be sure to check your spam too.",
-		});
+		return toast.info(
+			"We sent you a login link. Be sure to check your spam too."
+		);
 	}
 
 	return (

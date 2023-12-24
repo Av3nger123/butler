@@ -15,7 +15,7 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import { Eye, EyeIcon, EyeOffIcon } from "lucide-react";
 import { EyeClosedIcon } from "@radix-ui/react-icons";
-import { Database } from "@/types";
+import { DatabaseCluster } from "@/types";
 import {
 	Select,
 	SelectContent,
@@ -29,7 +29,7 @@ import { decrypt, encrypt } from "@/lib/utils";
 import { postApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
 import useUserStore from "@/lib/store/userstore";
-import { useToast } from "./ui/use-toast";
+import { toast } from "sonner";
 
 const databaseSchema = z.object({
 	name: z.string().min(2, {
@@ -52,11 +52,11 @@ const databaseSchema = z.object({
 	}),
 });
 interface DatabaseFormProps {
-	databaseCluster: Database | null;
+	databaseCluster: DatabaseCluster | null;
 	refetch: Function;
 }
 
-const portTypes: { [key in Database["type"]]: string } = {
+const portTypes: { [key in DatabaseCluster["type"]]: string } = {
 	postgres: "5432",
 	mysql: "3306",
 	sqllite: "8191",
@@ -66,7 +66,6 @@ export function DatabaseForm({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseFormProps>) {
-	const { toast } = useToast();
 	const permissions = useUserStore((state) => state.permissions);
 	const workspace = useWorkspaceStore((state) => state.workspace);
 	const form = useForm<z.infer<typeof databaseSchema>>({
@@ -86,12 +85,9 @@ export function DatabaseForm({
 	async function onSubmit(values: z.infer<typeof databaseSchema>) {
 		if (
 			!permissions.includes("add-cluster") &&
-			!permissions.includes("add-cluster")
+			!permissions.includes("edit-cluster")
 		) {
-			toast({
-				title: "Permission Denied",
-				description: "You are not authorized to add/edit the cluster",
-			});
+			return toast.error("You are not authorized to add/edit the cluster");
 		} else {
 			let request: any = { ...values };
 			if (databaseCluster) {
@@ -99,8 +95,10 @@ export function DatabaseForm({
 			}
 			request["workspace_id"] = workspace?.id;
 			request["password"] = encrypt(values.password);
-			const response = await postApi("/api/clusters", JSON.stringify(request));
-			refetch();
+			postApi("/api/clusters", JSON.stringify(request)).then((response) => {
+				toast.success("Cluster Saved successfully");
+				refetch();
+			});
 		}
 	}
 	return (

@@ -76,7 +76,7 @@ export function DataTable<TData, TValue>({
 	});
 
 	return (
-		<div>
+		<div className=" min-h-[69vh]">
 			{filterColumn && (
 				<div className="flex items-center py-4">
 					<Input
@@ -90,8 +90,8 @@ export function DataTable<TData, TValue>({
 					<DataTableViewOptions table={table} />
 				</div>
 			)}
-			<div className="rounded-md border">
-				<Table>
+			<div className="rounded-md border flex-1 h-full">
+				<Table className="h-full">
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>

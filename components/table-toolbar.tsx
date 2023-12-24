@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import useFilterStore from "@/lib/store/filterstore";
-import { has, uniqueId } from "lodash";
+import { has, isEmpty, uniqueId } from "lodash";
 import { useTable } from "@/lib/context/table-context";
 import {
 	Popover,
@@ -43,8 +43,7 @@ const TableToolbar: React.FC = () => {
 	return (
 		<div className="flex items-center justify-center mb-1 gap-1 rounded-sm p-1">
 			<Button variant="secondary" onClick={() => refetch()}>
-				<Play className="mr-2 h-4 w-4 opacity-70" />{" "}
-				{has(filters, path) && filters[path].length > 0 ? "Execute" : "Refetch"}
+				<Play className="mr-2 h-4 w-4 opacity-70" /> Refetch
 			</Button>
 			<Popover>
 				<PopoverTrigger asChild>
@@ -98,6 +97,7 @@ const TableToolbar: React.FC = () => {
 			</Button>
 			<Button
 				variant="secondary"
+				disabled={isEmpty(selectedIds)}
 				onClick={() => {
 					selectedIds.forEach((id) => {
 						deleteDataDiff(path, id);

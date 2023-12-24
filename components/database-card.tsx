@@ -46,19 +46,20 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { DatabaseForm } from "./database-form";
 import Link from "next/link";
-import { Database } from "@/types";
+import { DatabaseCluster } from "@/types";
 import { Skeleton } from "./ui/skeleton";
 import { deleteApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
 import useUserStore from "@/lib/store/userstore";
 import { useToast } from "./ui/use-toast";
+import { toast } from "sonner";
 
 interface DatabaseCardProps {
-	databaseCluster: Database;
+	databaseCluster: DatabaseCluster;
 	refetch: any;
 }
 
-const colorTypes: { [key in Database["type"]]: string } = {
+const colorTypes: { [key in DatabaseCluster["type"]]: string } = {
 	postgres: "#0064a5",
 	mysql: "#f29111",
 	sqllite: "#044a64",
@@ -69,16 +70,11 @@ export function DatabaseCard({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseCardProps>) {
-	const { toast } = useToast();
 	const permissions = useUserStore((state) => state.permissions);
 	const { cluster, setCluster } = useClusterStore();
 	async function handleDelete() {
 		if (!permissions.includes("delete-cluster")) {
-			toast({
-				title: "Permission denied",
-				description: "You are not authorized to delete this cluster",
-			});
-			return;
+			return toast.error("You are not authorized to delete this cluster");
 		}
 		await deleteApi(`/api/clusters/${databaseCluster.id}`, "");
 		refetch();
@@ -100,10 +96,12 @@ export function DatabaseCard({
 						{databaseCluster.host}:{databaseCluster.port}
 					</CardDescription>
 				</div>
-				<div className="flex items-center space-x-1 rounded-md">
+				<div className="flex items-start justify-end gap-1 rounded-md">
 					<Dialog>
-						<DialogTrigger>
-							<Settings2 />
+						<DialogTrigger asChild>
+							<Button size={"icon"} variant={"outline"}>
+								<Edit className="w-4 h-4" />
+							</Button>
 						</DialogTrigger>
 						<DialogContent className="sm:max-w-[425px]">
 							<DialogHeader>
@@ -119,10 +117,11 @@ export function DatabaseCard({
 							/>
 						</DialogContent>
 					</Dialog>
-					<Separator orientation="vertical" className="h-[20px]" />
 					<AlertDialog>
-						<AlertDialogTrigger>
-							<Trash />
+						<AlertDialogTrigger asChild>
+							<Button size={"icon"} variant={"outline"}>
+								<Trash className="w-4 h-4" />
+							</Button>
 						</AlertDialogTrigger>
 						<AlertDialogContent>
 							<AlertDialogHeader>

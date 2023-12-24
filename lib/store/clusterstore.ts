@@ -2,11 +2,11 @@
 import { StateCreator, create } from "zustand";
 import { StorageValue, persist } from "zustand/middleware";
 import { encrypt, decrypt } from "@/lib/utils";
-import { Database } from "@/types";
+import { DatabaseCluster } from "@/types";
 
 interface ClusterStoreState {
-	cluster: Database | null;
-	setCluster: (cluster: Database) => void;
+	cluster: DatabaseCluster | null;
+	setCluster: (cluster: DatabaseCluster) => void;
 	clear: () => void;
 }
 

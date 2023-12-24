@@ -1,4 +1,4 @@
-type Database = {
+type DatabaseCluster = {
 	id: string;
 	name: string;
 	host: string;

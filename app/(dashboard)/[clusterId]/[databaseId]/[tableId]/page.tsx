@@ -15,17 +15,17 @@ const FiltersNoSSR = dynamic(() => import("@/components/filters"), {
 
 export default function Page({
 	params,
-}: {
+}: Readonly<{
 	params: { clusterId: string; tableId: string; databaseId: string };
-}) {
+}>) {
 	return (
-		<div className="p-2">
+		<div className="h-full p-2">
 			<TableContextProvider
 				clusterId={params.clusterId}
 				tableId={params.tableId}
 				databaseId={params.databaseId}
 			>
-				<Tabs defaultValue="data" className="w-full">
+				<Tabs defaultValue="data" className="w-full h-full">
 					<TabsList>
 						<TabsTrigger value="data">Table</TabsTrigger>
 						<TabsTrigger value="commits">Commits</TabsTrigger>

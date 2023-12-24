@@ -2,6 +2,12 @@
 
 import { Commits } from "@/components/commits";
 import { SidebarNav } from "@/components/side-nav";
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { useGetCommits, useGetTables } from "@/hooks/databases";
 import { getApi, postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
 import { decrypt } from "@/lib/utils";
@@ -18,51 +24,34 @@ export default function Page({
 	};
 }>) {
 	const { cluster } = useClusterStore();
-	const { data: databaseTables } = useQuery({
-		queryKey: ["tables", params.clusterId, params.databaseId],
-		queryFn: async () => {
-			if (cluster)
-				return await postApi(
-					"http://localhost:8080/tables",
-					JSON.stringify({
-						...cluster,
-						password: decrypt(cluster.password),
-						database: params.databaseId,
-					})
-				);
-		},
-		enabled: !!cluster,
-	});
-	const { data } = useQuery({
-		queryKey: ["queries", params.clusterId, params.databaseId],
-		queryFn: async () => {
-			return await getApi(
-				`/api/clusters/${params.clusterId}/commits?databaseId=${params.databaseId}`
-			);
-		},
-		enabled: !!cluster,
-	});
+
+	const { data: DatabaseTables } = useGetTables(cluster, params.databaseId);
+
+	const { data: DatabaseCommits } = useGetCommits(cluster, params.databaseId);
 
 	const tables = useMemo(() => {
 		let tables: SidebarNavItem[] = [];
 
-		databaseTables?.tables?.forEach((database: string) => {
+		DatabaseTables?.tables?.forEach((database: string) => {
 			tables.push({ name: database });
 		});
 		return tables;
-	}, [databaseTables]);
+	}, [DatabaseTables]);
 
 	return (
-		<div className="flex flex-row">
-			<div className="border-r w-fit h-full">
+		<ResizablePanelGroup direction="horizontal" className="min-h-[79vh] border">
+			<ResizablePanel defaultSize={15}>
 				<SidebarNav
 					type="table"
 					items={tables?.map((element: SidebarNavItem) => ({
 						name: element.name,
 					}))}
 				/>
-			</div>
-			<Commits commits={data?.commits} />
-		</div>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel defaultSize={85}>
+				<Commits commits={DatabaseCommits?.commits} />
+			</ResizablePanel>
+		</ResizablePanelGroup>
 	);
 }

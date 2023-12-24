@@ -63,7 +63,7 @@ export function TableFilter({
 
 	return (
 		<div className="grid grid-cols-12 gap-1">
-			<div className="col-span-2">
+			<div className="col-span-2 w-full">
 				<Combobox
 					type="Column"
 					items={schemaItems}
@@ -71,7 +71,7 @@ export function TableFilter({
 					onChange={(val: any) => setColumn(path, index, val)}
 				/>
 			</div>
-			<div className="col-span-2">
+			<div className="col-span-2 w-full">
 				<Combobox
 					type="Operator"
 					items={operators}

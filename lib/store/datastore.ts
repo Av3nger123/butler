@@ -2,7 +2,7 @@
 import { StateCreator, create } from "zustand";
 import { StorageValue, createJSONStorage, persist } from "zustand/middleware";
 import { encrypt, decrypt } from "@/lib/utils";
-import { Database } from "@/types";
+import { DatabaseCluster } from "@/types";
 import { has, isEmpty } from "lodash";
 
 interface DataStoreState {

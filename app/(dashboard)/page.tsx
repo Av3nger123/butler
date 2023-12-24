@@ -13,19 +13,16 @@ import {
 } from "@/components/ui/dialog";
 import { DatabaseForm } from "@/components/database-form";
 import { useQuery } from "@tanstack/react-query";
-import { DatabaseCards } from "./database-cards";
+import { DatabaseCards } from "../../components/database-cards";
 import { getApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
+import { useGetClusters } from "@/hooks/cluster";
+import { useEffect } from "react";
 
 export default function Home() {
 	const workspace = useWorkspaceStore((state) => state.workspace);
-	const { data, refetch } = useQuery({
-		queryKey: ["clusters", workspace?.id],
-		queryFn: async () => {
-			return await getApi(`/api/clusters?workspaceId=${workspace?.id}`);
-		},
-		enabled: !!workspace?.id,
-	});
+	const { data: WorkspaceClusters, refetch } = useGetClusters(workspace);
+
 	return (
 		<main className="flex flex-col items-center justify-between p-10">
 			<div className="container mx-auto p-4">
@@ -50,7 +47,10 @@ export default function Home() {
 						</DialogContent>
 					</Dialog>
 				</div>
-				<DatabaseCards clusters={data?.clusters} refetch={refetch} />
+				<DatabaseCards
+					clusters={WorkspaceClusters?.clusters}
+					refetch={refetch}
+				/>
 			</div>
 		</main>
 	);
