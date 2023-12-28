@@ -141,6 +141,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 					`http://localhost:8080/metadata`,
 					JSON.stringify({
 						...cluster,
+						port: parseInt(cluster.port),
 						password: decrypt(cluster.password),
 						database: databaseId,
 						table: tableId,
@@ -163,7 +164,6 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 			pageIndex,
 			pageSize,
 			sorting,
-			filters,
 		],
 		queryFn: async () => {
 			if (cluster) {
@@ -189,6 +189,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 					url,
 					JSON.stringify({
 						...cluster,
+						port: parseInt(cluster.port),
 						password: decrypt(cluster.password),
 						database: databaseId,
 						table: tableId,

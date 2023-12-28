@@ -16,7 +16,10 @@ export const fontSans = FontSans({
 	variable: "--font-sans",
 });
 
-export const firaCode = Fira_Code({ subsets: ["greek"], variable: "--" });
+export const firaCode = FiraCode({
+	subsets: ["greek"],
+	variable: "--font-sans",
+});
 
 export default async function RootLayout({
 	children,
@@ -31,7 +34,7 @@ export default async function RootLayout({
 			<body
 				className={cn(
 					"min-h-screen bg-background font-sans antialiased",
-					firaCode.className
+					firaCode.variable
 				)}
 			>
 				<ThemeProvider

@@ -12,6 +12,7 @@ export const useGetDatabases = (cluster: DatabaseCluster | null) => {
 					"http://localhost:8080/databases",
 					JSON.stringify({
 						...cluster,
+						port: parseInt(cluster.port),
 						password: decrypt(cluster.password),
 					})
 				);
@@ -32,6 +33,7 @@ export const useGetTables = (
 					"http://localhost:8080/tables",
 					JSON.stringify({
 						...cluster,
+						port: parseInt(cluster.port),
 						password: decrypt(cluster.password),
 						database: database,
 					})

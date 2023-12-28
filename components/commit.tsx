@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
-import { firaCode } from "./ui/fonts";
 import { cn } from "@/lib/utils";
 
 export function Commit({ commit }: Readonly<{ commit: any }>) {
@@ -44,12 +43,7 @@ export function Commit({ commit }: Readonly<{ commit: any }>) {
 	}, [commit]);
 
 	return (
-		<div
-			className={cn(
-				"border rounded-2xl p-3 flex flex-col gap-2",
-				firaCode.className
-			)}
-		>
+		<div className={cn("border rounded-2xl p-3 flex flex-col gap-2")}>
 			<div>
 				<h4 className="font-bold">{commit.title}</h4>
 			</div>

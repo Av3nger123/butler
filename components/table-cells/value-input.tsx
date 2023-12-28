@@ -26,6 +26,7 @@ export function ValueInput({ value, onChange, type }: ValueInputProps) {
 
 	return (
 		<Input
+			className="min-w-[150px]"
 			type={inputType}
 			value={value}
 			onChange={(e) => onChange(e.target.value)}

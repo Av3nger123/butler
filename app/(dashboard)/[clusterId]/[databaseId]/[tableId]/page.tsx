@@ -19,7 +19,7 @@ export default function Page({
 	params: { clusterId: string; tableId: string; databaseId: string };
 }>) {
 	return (
-		<div className="h-full p-2">
+		<div className="h-full min-h-[79vh] p-2">
 			<TableContextProvider
 				clusterId={params.clusterId}
 				tableId={params.tableId}

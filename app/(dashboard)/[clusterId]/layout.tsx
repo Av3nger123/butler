@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { firaCode } from "@/components/ui/fonts";
 import { cn } from "@/lib/utils";
 
 const BreadcrumbsNoSSR = dynamic(() => import("@/components/breadcrumbs"), {

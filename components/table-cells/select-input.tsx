@@ -16,7 +16,7 @@ import {
 export function SelectInput({ value, onChange, options }: SelectInputProps) {
 	return (
 		<Select onValueChange={onChange} defaultValue={value}>
-			<SelectTrigger className="w-[180px]">
+			<SelectTrigger className="min-w-[150px]">
 				<SelectValue placeholder="Select a fruit" />
 			</SelectTrigger>
 			<SelectContent>

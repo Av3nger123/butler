@@ -23,6 +23,8 @@ import { DataTablePagination } from "./table-pagination";
 import { DataTableViewOptions } from "./column-toggle";
 import { useTable } from "@/lib/context/table-context";
 import useDataStore from "@/lib/store/datastore";
+import "@/styles/table.css";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
 	filterColumn: string | null;
@@ -56,6 +58,8 @@ export function DataTable<TData, TValue>({
 	const table = useReactTable({
 		data,
 		columns,
+		enableColumnResizing: true,
+		columnResizeMode: "onChange",
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		manualPagination: true,
@@ -97,13 +101,26 @@ export function DataTable<TData, TValue>({
 							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => {
 									return (
-										<TableHead key={header.id} className="border">
+										<TableHead
+											key={header.id}
+											className="border relative"
+											style={{ width: header.getSize() }}
+										>
 											{header.isPlaceholder
 												? null
 												: flexRender(
 														header.column.columnDef.header,
 														header.getContext()
 												  )}
+											{header.column.getCanResize() && (
+												<div
+													onMouseDown={header.getResizeHandler()}
+													onTouchStart={header.getResizeHandler()}
+													className={`resizer ${
+														header.column.getIsResizing() ? "isResizing" : ""
+													}`}
+												></div>
+											)}
 										</TableHead>
 									);
 								})}
@@ -121,6 +138,7 @@ export function DataTable<TData, TValue>({
 										<TableCell
 											key={cell.id}
 											className="whitespace-nowrap border"
+											style={{ width: cell.column.getSize() }}
 										>
 											{flexRender(
 												cell.column.columnDef.cell,

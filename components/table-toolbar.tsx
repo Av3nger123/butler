@@ -21,6 +21,7 @@ import {
 import useDataStore from "@/lib/store/datastore";
 import { defaultRow, generateQuery } from "@/lib/utils";
 import { SQLEditor } from "./sql-editor";
+import { useQueryClient } from "@tanstack/react-query";
 
 const TableToolbar: React.FC = () => {
 	const { filters, addFilter, clear } = useFilterStore();
@@ -39,10 +40,20 @@ const TableToolbar: React.FC = () => {
 		refetch,
 		pkFormat,
 		setData,
+		setPagination,
 	} = useTable();
+
+	const queryClient = useQueryClient();
 	return (
 		<div className="flex items-center justify-center mb-1 gap-1 rounded-sm p-1">
-			<Button variant="secondary" onClick={() => refetch()}>
+			<Button
+				variant="secondary"
+				onClick={() => {
+					refetch();
+					queryClient.invalidateQueries({ queryKey: ["data"] });
+					setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+				}}
+			>
 				<Play className="mr-2 h-4 w-4 opacity-70" /> Refetch
 			</Button>
 			<Popover>
@@ -51,7 +62,7 @@ const TableToolbar: React.FC = () => {
 						<Eye className="mr-2 h-4 w-4 opacity-70" /> Query
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="w-[1000px] min-w-96">
+				<PopoverContent className="max-w-[50vh]">
 					{!!dataDiff && (
 						<SQLEditor
 							code={generateQuery(tableId, dataDiff[path], pkFormat)}
