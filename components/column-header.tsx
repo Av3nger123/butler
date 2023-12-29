@@ -21,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Schema } from "@/types";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface DataTableColumnHeaderProps<TData, TValue>
 	extends React.HTMLAttributes<HTMLDivElement> {
@@ -34,13 +35,37 @@ export function DataTableColumnHeader<TData, TValue>({
 	title,
 	className,
 	schema,
-}: DataTableColumnHeaderProps<TData, TValue>) {
+}: Readonly<DataTableColumnHeaderProps<TData, TValue>>) {
+	const ref = useRef<any>(null);
+
+	const [initialWidth, setInitialWidth] = useState();
+	useEffect(() => {
+		if (ref.current) {
+			const divWidth = ref.current?.offsetWidth;
+			setInitialWidth(divWidth);
+		}
+	}, []);
+
+	const width = useMemo(() => {
+		if (initialWidth) {
+			if (initialWidth > column.getSize()) {
+				return initialWidth;
+			} else {
+				return column.getSize();
+			}
+		}
+	}, [column.getSize(), initialWidth]);
+
 	if (!column.getCanSort()) {
 		return <div className={cn(className)}>{title}</div>;
 	}
 
 	return (
-		<div className={cn("flex items-center space-x-1", className)}>
+		<div
+			ref={ref}
+			className={cn("flex items-center space-x-1", className)}
+			style={{ width: width }}
+		>
 			<Popover>
 				<PopoverTrigger asChild>
 					<Button variant="ghost" size="sm">
