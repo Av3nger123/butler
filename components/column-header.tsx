@@ -54,7 +54,7 @@ export function DataTableColumnHeader<TData, TValue>({
 				return column.getSize();
 			}
 		}
-	}, [column.getSize(), initialWidth]);
+	}, [column.getSize()]);
 
 	if (!column.getCanSort()) {
 		return <div className={cn(className)}>{title}</div>;
@@ -64,7 +64,7 @@ export function DataTableColumnHeader<TData, TValue>({
 		<div
 			ref={ref}
 			className={cn("flex items-center space-x-1", className)}
-			style={{ width: width }}
+			style={{ minWidth: initialWidth, width: width }}
 		>
 			<Popover>
 				<PopoverTrigger asChild>
