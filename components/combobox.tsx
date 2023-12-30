@@ -16,6 +16,7 @@ interface ComboboxProps {
 	value: any;
 	onChange: any;
 	type: string;
+	disabled: boolean;
 }
 
 const Combobox: React.FC<ComboboxProps> = ({
@@ -23,6 +24,7 @@ const Combobox: React.FC<ComboboxProps> = ({
 	value,
 	onChange,
 	type,
+	disabled = false,
 }) => {
 	const [open, setOpen] = useState<boolean>(false);
 	return (
@@ -33,6 +35,7 @@ const Combobox: React.FC<ComboboxProps> = ({
 					role="combobox"
 					aria-expanded={open}
 					className="w-full justify-between"
+					disabled={disabled}
 				>
 					{value
 						? items.find((item) => item.value === value)?.label

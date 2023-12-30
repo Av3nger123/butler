@@ -23,11 +23,12 @@ import { CreateWorkspace, WorkspaceDetails } from "./profile-menu/workspace";
 import { Workspace } from "@prisma/client";
 import dynamic from "next/dynamic";
 import useUserStore from "@/lib/store/userstore";
-import { redirect } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const Combobox = dynamic(() => import("@/components/combobox"), { ssr: false });
 
 export function AppBar() {
+	const pathname = usePathname();
 	const { data: session } = useSession();
 	const setUser = useUserStore((state) => state.setUser);
 
@@ -70,6 +71,12 @@ export function AppBar() {
 		},
 	});
 
+	const disable = useMemo(() => {
+		return pathname.split("/").filter((val) => val != "").length > 0;
+	}, [pathname]);
+
+	console.log();
+
 	const workspaces = useMemo(
 		() =>
 			data?.workspaces?.map((workspace: Workspace) => ({
@@ -93,9 +100,9 @@ export function AppBar() {
 								(workspace: Workspace) => workspace.name.toLowerCase() == value
 							)[0]
 						);
-						redirect("/");
 					}}
 					value={workspace?.id}
+					disabled={disable}
 				/>
 			</div>
 			<div className="col-span-6" />

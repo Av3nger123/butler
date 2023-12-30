@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import Image from "next/image";
 import {
 	Dialog,
 	DialogContent,
@@ -12,12 +11,9 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { DatabaseForm } from "@/components/database-form";
-import { useQuery } from "@tanstack/react-query";
 import { DatabaseCards } from "../../components/database-cards";
-import { getApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
 import { useGetClusters } from "@/hooks/cluster";
-import { useEffect } from "react";
 
 export default function Home() {
 	const workspace = useWorkspaceStore((state) => state.workspace);
@@ -25,7 +21,7 @@ export default function Home() {
 
 	return (
 		<main className="flex flex-col items-center justify-between p-10">
-			<div className="mx-auto border rounded-xl bg-primary-foreground">
+			<div className="container mx-auto border rounded-xl bg-primary-foreground">
 				<div className="flex flex-row gap-2 items-center justify-between border-b p-4">
 					<h1 className="text-2xl font-bold">Your Database clusters</h1>
 					<Dialog>
