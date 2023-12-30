@@ -25,12 +25,12 @@ export default function Home() {
 
 	return (
 		<main className="flex flex-col items-center justify-between p-10">
-			<div className="container mx-auto p-4">
-				<div className="flex flex-row gap-2 items-start justify-between">
-					<h1 className="text-2xl font-bold mb-4">Your Database clusters</h1>
+			<div className="mx-auto border rounded-xl bg-primary-foreground">
+				<div className="flex flex-row gap-2 items-center justify-between border-b p-4">
+					<h1 className="text-2xl font-bold">Your Database clusters</h1>
 					<Dialog>
 						<DialogTrigger asChild>
-							<Button variant={"outline"}>
+							<Button>
 								<PlusCircle className="mr-2 h-4 w-4" />
 								Add Cluster
 							</Button>

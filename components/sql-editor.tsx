@@ -12,11 +12,10 @@ export function SQLEditor({ code, setCode }: { code: string; setCode: any }) {
 			<CodeEditor
 				value={code}
 				language="sql"
-				placeholder="...notepad"
 				onChange={(evn) => setCode(evn.target.value)}
 				padding={15}
 				style={{
-					fontSize: 18,
+					fontSize: 14,
 					height: "100%",
 					backgroundColor: `${theme == "light" ? "#ffffff" : "#020817"}`,
 					fontFamily:

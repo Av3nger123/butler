@@ -4,7 +4,6 @@ import { decrypt } from "@/lib/utils";
 import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
 import { useGetDatabases } from "@/hooks/databases";
 import {

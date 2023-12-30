@@ -62,7 +62,7 @@ const TableToolbar: React.FC = () => {
 						<Eye className="mr-2 h-4 w-4 opacity-70" /> Query
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="max-w-[50vh]">
+				<PopoverContent className="w-[100vh]">
 					{!!dataDiff && (
 						<SQLEditor
 							code={generateQuery(tableId, dataDiff[path], pkFormat)}

@@ -35,6 +35,7 @@ import {
 	DeleteIcon,
 	Edit,
 	Edit2,
+	Loader2,
 	LucideDelete,
 	Settings2,
 	StarIcon,
@@ -48,11 +49,15 @@ import { DatabaseForm } from "./database-form";
 import Link from "next/link";
 import { DatabaseCluster } from "@/types";
 import { Skeleton } from "./ui/skeleton";
-import { deleteApi } from "@/lib/api";
+import { deleteApi, postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
 import useUserStore from "@/lib/store/userstore";
 import { useToast } from "./ui/use-toast";
 import { toast } from "sonner";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { decrypt } from "@/lib/utils";
+import { redirect } from "next/navigation";
 
 interface DatabaseCardProps {
 	databaseCluster: DatabaseCluster;
@@ -72,6 +77,10 @@ export function DatabaseCard({
 }: Readonly<DatabaseCardProps>) {
 	const permissions = useUserStore((state) => state.permissions);
 	const { cluster, setCluster } = useClusterStore();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
+	const [success, setSuccess] = useState(false);
+
 	async function handleDelete() {
 		if (!permissions.includes("delete-cluster")) {
 			return toast.error("You are not authorized to delete this cluster");
@@ -81,17 +90,49 @@ export function DatabaseCard({
 	}
 
 	async function handleClusterCLick() {
-		setCluster(databaseCluster);
+		setLoading(true);
+		setError(false);
+		setSuccess(false);
+		postApi(
+			"http://localhost:8080/ping",
+			JSON.stringify({
+				...databaseCluster,
+				port: parseInt(databaseCluster.port),
+				password: decrypt(databaseCluster.password),
+			})
+		)
+			.then((response) => {
+				if (response.error) {
+					setError(true);
+				} else {
+					setSuccess(true);
+				}
+				setLoading(false);
+			})
+			.catch((err) => {
+				setError(true);
+				setLoading(false);
+			});
 	}
+
+	useEffect(() => {
+		if (success) {
+			toast.success("Connection established successfully");
+			setCluster(databaseCluster);
+			redirect(`/${databaseCluster?.id}`);
+		}
+	}, [databaseCluster?.id, success]);
+
+	useEffect(() => {
+		if (error) {
+			toast.error("Failed connecting to the cluster");
+		}
+	}, [error]);
 	return (
-		<Card>
+		<Card className="flex flex-col justify-between">
 			<CardHeader className="grid grid-cols-[1fr_110px] items-start gap-1 space-y-0">
 				<div className="space-y-1">
-					<CardTitle>
-						<Link href={`/${databaseCluster.id}`} onClick={handleClusterCLick}>
-							{databaseCluster.name}
-						</Link>
-					</CardTitle>
+					<CardTitle>{databaseCluster.name}</CardTitle>
 					<CardDescription>
 						{databaseCluster.host}:{databaseCluster.port}
 					</CardDescription>
@@ -143,15 +184,20 @@ export function DatabaseCard({
 				</div>
 			</CardHeader>
 			<CardContent>
-				<div className="flex space-x-4 text-sm text-muted-foreground">
-					<div className="flex items-center">
-						<CircleIcon
-							className={`mr-1 h-3 w-3 fill-[${
-								colorTypes[databaseCluster.type]
-							}] text-[${colorTypes[databaseCluster.type]}]`}
+				<div className="flex justify-between space-x-4 text-sm text-muted-foreground">
+					<div className="flex items-center gap-2">
+						<Image
+							src={`/images/${databaseCluster?.type}.svg`}
+							alt="unlock"
+							width={20 * (databaseCluster?.type === "mysql" ? 2 : 1)}
+							height={20 * (databaseCluster?.type === "mysql" ? 2 : 1)}
 						/>
 						{databaseCluster.type}
 					</div>
+					<Button disabled={loading} onClick={handleClusterCLick}>
+						{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+						{loading ? "Connecting..." : success ? "Connected" : "Connect"}
+					</Button>
 				</div>
 			</CardContent>
 		</Card>

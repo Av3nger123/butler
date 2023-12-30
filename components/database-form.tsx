@@ -140,7 +140,8 @@ export function DatabaseForm({
 											<SelectGroup>
 												<SelectItem value="postgres">PostgreSQL</SelectItem>
 												<SelectItem value="mysql">MySQL</SelectItem>
-												<SelectItem value="mssql">MsSQl</SelectItem>
+												<SelectItem value="mssql">MSSQl</SelectItem>
+												<SelectItem value="mariadb">Maria DB</SelectItem>
 											</SelectGroup>
 										</SelectContent>
 									</Select>
