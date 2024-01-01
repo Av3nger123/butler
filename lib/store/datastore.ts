@@ -18,16 +18,17 @@ interface DataStoreState {
 		operation: string,
 		pk: string,
 		column: string,
-		value: any
+		newValue: any,
+		oldValue: any
 	) => void;
-	deleteDataDiff: (key: string, pk: string) => void;
+	deleteDataDiff: (key: string, pk: string, oldValue: any) => void;
 	revertDataDiff: (
 		key: string,
 		operation: string,
 		pk: string,
 		column: string
 	) => void;
-	clearDataDiff: (ke: string) => void;
+	clearDataDiff: (key: string) => void;
 }
 
 const createStore: StateCreator<DataStoreState> = (set) => ({
@@ -42,16 +43,16 @@ const createStore: StateCreator<DataStoreState> = (set) => ({
 				};
 			}
 			if (!has(state.dataDiff[key][operation], pk)) {
-				state.dataDiff[key][operation][pk] = {};
+				state.dataDiff[key][operation][pk] = { newValue: {}, oldValue: {} };
 			}
-			state.dataDiff[key][operation][pk] = value;
+			state.dataDiff[key][operation][pk]["newValue"] = value;
 			return {
 				dataDiff: {
 					...state.dataDiff,
 				},
 			};
 		}),
-	deleteDataDiff: (key: string, pk: string) =>
+	deleteDataDiff: (key: string, pk: string, oldValue: any) =>
 		set((state) => {
 			if (!has(state.dataDiff, key)) {
 				state.dataDiff[key] = {
@@ -67,18 +68,20 @@ const createStore: StateCreator<DataStoreState> = (set) => ({
 					delete state.dataDiff[key]["update"][pk];
 				}
 				if (!has(state.dataDiff[key]["delete"], pk)) {
-					state.dataDiff[key]["delete"][pk] = true;
+					state.dataDiff[key]["delete"][pk] = {
+						newValue: {},
+						oldValue: oldValue,
+					};
 				}
 			}
 
-			console.log(state.dataDiff[key]);
 			return {
 				dataDiff: {
 					...state.dataDiff,
 				},
 			};
 		}),
-	setDataDiff: (key, operation, pk, column, value) =>
+	setDataDiff: (key, operation, pk, column, newValue, oldValue) =>
 		set((state) => {
 			if (!has(state.dataDiff, key)) {
 				state.dataDiff[key] = {
@@ -88,9 +91,10 @@ const createStore: StateCreator<DataStoreState> = (set) => ({
 				};
 			}
 			if (!has(state.dataDiff[key][operation], pk)) {
-				state.dataDiff[key][operation][pk] = {};
+				state.dataDiff[key][operation][pk] = { newValue: {}, oldValue: {} };
 			}
-			state.dataDiff[key][operation][pk][column] = value;
+			state.dataDiff[key][operation][pk]["newValue"][column] = newValue;
+			state.dataDiff[key][operation][pk]["oldValue"] = oldValue;
 			return {
 				dataDiff: {
 					...state.dataDiff,

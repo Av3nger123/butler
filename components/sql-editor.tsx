@@ -8,7 +8,7 @@ export function SQLEditor({ code, setCode }: { code: string; setCode: any }) {
 	const { theme } = useTheme();
 
 	return (
-		<div className="rounded-md  border shadow-md h-96 w-full">
+		<div className="rounded-md  border shadow-md h-96 w-full overflow-auto">
 			<CodeEditor
 				value={code}
 				language="sql"
@@ -17,6 +17,7 @@ export function SQLEditor({ code, setCode }: { code: string; setCode: any }) {
 				style={{
 					fontSize: 14,
 					height: "100%",
+					overflow: "auto",
 					backgroundColor: `${theme == "light" ? "#ffffff" : "#020817"}`,
 					fontFamily:
 						"ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",

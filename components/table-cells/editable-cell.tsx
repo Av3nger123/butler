@@ -27,17 +27,13 @@ export function EditableCell({
 		return schemas[column.id];
 	}, [schemas, column]);
 
-	const pk = useMemo(() => {
-		return getPrimaryKey(pkFormat, row.original);
-	}, [pkFormat, row.original]);
-
 	const operation = useMemo(() => {
-		if (pk === defaultPrimaryKey) {
+		if (row.original.primaryKey?.indexOf("_") != -1) {
 			return "add";
 		} else {
 			return "update";
 		}
-	}, [defaultPrimaryKey, pk]);
+	}, [row.original.primaryKey]);
 
 	const initialValue = getValue();
 	const [value, setValue] = useState(
@@ -52,9 +48,16 @@ export function EditableCell({
 	const onChange = useCallback(
 		(val: any) => {
 			setValue(val);
-			if (initialValue !== val)
-				setDataDiff(key, operation, row.original.primaryKey, column.id, val);
-			else if (pk !== defaultPrimaryKey) {
+			if (initialValue !== val) {
+				setDataDiff(
+					key,
+					operation,
+					row.original.primaryKey,
+					column.id,
+					val,
+					row.original
+				);
+			} else if (row.original.primaryKey !== defaultPrimaryKey) {
 				revertDataDiff(key, operation, row.original.primaryKey, column.id);
 			}
 		},
@@ -64,7 +67,6 @@ export function EditableCell({
 			initialValue,
 			key,
 			operation,
-			pk,
 			revertDataDiff,
 			row.original,
 			setDataDiff,
@@ -80,7 +82,10 @@ export function EditableCell({
 			return "bg-green-400 bg-opacity-25 dark:bg-opacity-70 dark:bg-green-800";
 		}
 		if (
-			has(dataDiff, `${key}.update.${row.original?.primaryKey}.${column.id}`)
+			has(
+				dataDiff,
+				`${key}.update.${row.original?.primaryKey}.newValue.${column.id}`
+			)
 		) {
 			return "bg-yellow-400 bg-opacity-25 dark:bg-opacity-70 dark:bg-yellow-800";
 		}

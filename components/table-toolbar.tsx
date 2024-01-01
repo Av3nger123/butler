@@ -19,9 +19,10 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import useDataStore from "@/lib/store/datastore";
-import { defaultRow, generateQuery } from "@/lib/utils";
+import { createHashId, defaultRow, generateQuery } from "@/lib/utils";
 import { SQLEditor } from "./sql-editor";
 import { useQueryClient } from "@tanstack/react-query";
+import { generateQueriesFromJSON } from "@/lib/query";
 
 const TableToolbar: React.FC = () => {
 	const { filters, addFilter, clear } = useFilterStore();
@@ -65,7 +66,17 @@ const TableToolbar: React.FC = () => {
 				<PopoverContent className="w-[100vh]">
 					{!!dataDiff && (
 						<SQLEditor
-							code={generateQuery(tableId, dataDiff[path], pkFormat)}
+							code={`--- Queries ---\n${generateQueriesFromJSON(
+								dataDiff[path],
+								tableId,
+								pkFormat
+							)?.queries?.join(
+								"\n\n"
+							)}\n\n--- Revert queries ---\n${generateQueriesFromJSON(
+								dataDiff[path],
+								tableId,
+								pkFormat
+							)?.revertQueries?.join("\n\n")}`}
 							setCode={() => {}}
 						/>
 					)}
@@ -98,9 +109,11 @@ const TableToolbar: React.FC = () => {
 			<Button
 				variant="secondary"
 				onClick={() => {
-					let pk = uniqueId(`${path}_`);
-					let defaultRowVal = { ...defaultRow(schemas), primaryKey: pk };
+					let defaultRowVal = defaultRow(schemas);
+					let pk = uniqueId(`${createHashId(defaultRowVal)}_`);
+					defaultRowVal = { ...defaultRowVal, primaryKey: pk };
 					setData((prev: any[]) => [defaultRowVal, ...prev]);
+					console.log(defaultRowVal);
 					setDataDiffRow(path, "add", pk, defaultRowVal);
 				}}
 			>
@@ -110,8 +123,8 @@ const TableToolbar: React.FC = () => {
 				variant="secondary"
 				disabled={isEmpty(selectedIds)}
 				onClick={() => {
-					selectedIds.forEach((id) => {
-						deleteDataDiff(path, id);
+					Object.keys(selectedIds).forEach((key) => {
+						deleteDataDiff(path, key, selectedIds[key]);
 					});
 				}}
 			>

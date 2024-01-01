@@ -18,7 +18,7 @@ import React, {
 import { getApi, postApi } from "../api";
 import useClusterStore from "../store/clusterstore";
 import { Schema } from "@/types";
-import { decrypt, defaultRow, getPrimaryKey } from "../utils";
+import { createHashId, decrypt, defaultRow, getPrimaryKey } from "../utils";
 import useFilterStore from "../store/filterstore";
 import { has, isEmpty } from "lodash";
 import useDataStore from "../store/datastore";
@@ -31,7 +31,7 @@ interface TableContextType {
 	databaseId: string;
 	defaultPrimaryKey: string;
 	key: string;
-	selectedIds: string[];
+	selectedIds: { [key: string]: any };
 	refetch: () => void;
 	schemas: any;
 	data: any[];
@@ -95,7 +95,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	const filters = useFilterStore((state) => state.filters);
 	const [rowSelection, setRowSelection] = useState({});
 	const [selectedIndex, setSelectedIndex] = useState({});
-	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+	const [selectedIds, setSelectedIds] = useState<{ [key: string]: any }>({});
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [data, setData] = useState<any>([]);
 	const [pk, setPk] = useState<string>("");
@@ -202,9 +202,10 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	});
 
 	useEffect(() => {
-		let keys: string[] = [];
+		let keys: { [key: string]: any } = {};
 		Object.keys(rowSelection).forEach((value) => {
-			keys.push(data[parseInt(value)]?.primaryKey);
+			let row = data[parseInt(value)];
+			keys[row?.primaryKey] = row;
 		});
 		setSelectedIds(keys);
 	}, [rowSelection, data]);
@@ -237,7 +238,11 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 				};
 			});
 		}
-		setPk(pk.join("~"));
+		let pkFormat = pk.join("~");
+		if (pkFormat == "") {
+			pkFormat = Object.keys(schemas).join("~");
+		}
+		setPk(pkFormat);
 		return schemas;
 	}, [schemaData]);
 
@@ -251,12 +256,14 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 			tableData?.data?.forEach((row: any) => {
 				data.push({
 					...row,
-					primaryKey: getPrimaryKey(pk, row),
+					primaryKey: createHashId(row),
 				});
 			});
 		}
 		if (has(dataDiff, key) && !isEmpty(dataDiff[key]["add"])) {
-			let newRows = Object.values(dataDiff[key]["add"]);
+			let newRows = Object.values(dataDiff[key]["add"]).map(
+				(val: any) => val["newValue"]
+			);
 			data = newRows.concat(data);
 		}
 		setData(data);
@@ -264,6 +271,9 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 
 	const defaultPrimaryKey = useMemo(() => {
 		let defaultRowVal = defaultRow?.(schemas);
+		if (pk === "") {
+			return createHashId(defaultRowVal);
+		}
 		return getPrimaryKey(pk, defaultRowVal);
 	}, [pk, schemas]);
 
@@ -309,7 +319,6 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		selectedIds,
 		sorting,
 		tableData?.count,
-		tableData?.data,
 		tableId,
 	]);
 

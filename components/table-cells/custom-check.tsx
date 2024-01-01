@@ -7,7 +7,7 @@ export function CustomCheck({ row }: Readonly<{ row: Row<any> }>) {
 	return (
 		<Checkbox
 			className="mx-2"
-			checked={selectedIds.includes(row.original?.primaryKey)}
+			checked={Object.keys(selectedIds)?.includes(row.original?.primaryKey)}
 			onCheckedChange={(value) => row.toggleSelected(!!value)}
 			aria-label="Select row"
 		/>

@@ -196,7 +196,7 @@ export function DatabaseCard({
 					</div>
 					<Button disabled={loading} onClick={handleClusterCLick}>
 						{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-						{loading ? "Connecting..." : success ? "Connected" : "Connect"}
+						{loading ? "Connecting" : success ? "Connected" : "Connect"}
 					</Button>
 				</div>
 			</CardContent>

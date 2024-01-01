@@ -86,8 +86,7 @@ export function generateQuery(
 					arr.push(
 						`UPDATE "${table}" SET ${Object.keys(diffObject[operation][pk])
 							.map(
-								(column) =>
-									`"${column}" = '${diffObject[operation][pk][column]}'`
+								(column) => `"${column}" = ${diffObject[operation][pk][column]}`
 							)
 							.join(", ")} WHERE ${primaryKey
 							.split("~")
@@ -158,4 +157,11 @@ export function defaultRow(schemas: { [key: string]: Schema }) {
 		defaultRow[key] = defaultValue;
 	});
 	return defaultRow;
+}
+
+export function createHashId(json: any) {
+	const sortedJsonString = JSON.stringify(json, Object.keys(json).sort());
+	const hash = crypto.createHash("sha256");
+	hash.update(sortedJsonString);
+	return hash.digest("hex");
 }
