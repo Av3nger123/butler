@@ -23,10 +23,12 @@ import useFilterStore from "../store/filterstore";
 import { has, isEmpty } from "lodash";
 import useDataStore from "../store/datastore";
 import { dataColumns } from "@/components/data-columns";
+import { QueryResults, generateQueriesFromJSON } from "../query";
 
 interface TableContextType {
 	clusterId: string;
 	pkFormat: string;
+	generatedQueries: QueryResults;
 	tableId: string;
 	databaseId: string;
 	defaultPrimaryKey: string;
@@ -54,6 +56,7 @@ const initialTableContext: TableContextType = {
 	pkFormat: "",
 	databaseId: "",
 	selectedIds: [],
+	generatedQueries: { queries: [], revertQueries: [] },
 	defaultPrimaryKey: "",
 	refetch: () => {},
 	schemas: {},
@@ -93,6 +96,10 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	const { cluster } = useClusterStore();
 	const dataDiff = useDataStore((state) => state.dataDiff);
 	const filters = useFilterStore((state) => state.filters);
+	const [queries, setQueries] = useState<QueryResults>({
+		queries: [],
+		revertQueries: [],
+	});
 	const [rowSelection, setRowSelection] = useState({});
 	const [selectedIndex, setSelectedIndex] = useState({});
 	const [selectedIds, setSelectedIds] = useState<{ [key: string]: any }>({});
@@ -251,6 +258,10 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	}, [clusterId, databaseId, tableId]);
 
 	useEffect(() => {
+		setQueries(generateQueriesFromJSON(dataDiff[key], tableId, pk));
+	}, [dataDiff, key, pk, tableId]);
+
+	useEffect(() => {
 		let data: any[] = [];
 		if (tableData) {
 			tableData?.data?.forEach((row: any) => {
@@ -287,6 +298,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 				tableId,
 				defaultPrimaryKey,
 				databaseId,
+				generatedQueries: queries,
 				key: key,
 				refetch,
 				columns: cols,
@@ -313,6 +325,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		pageIndex,
 		pageSize,
 		pk,
+		queries,
 		refetch,
 		rowSelection,
 		schemas,

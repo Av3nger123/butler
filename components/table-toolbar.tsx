@@ -41,6 +41,7 @@ const TableToolbar: React.FC = () => {
 		refetch,
 		pkFormat,
 		setData,
+		generatedQueries,
 		setPagination,
 	} = useTable();
 
@@ -64,19 +65,13 @@ const TableToolbar: React.FC = () => {
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-[100vh]">
-					{!!dataDiff && (
+					{!!generatedQueries && (
 						<SQLEditor
-							code={`--- Queries ---\n${generateQueriesFromJSON(
-								dataDiff[path],
-								tableId,
-								pkFormat
-							)?.queries?.join(
+							code={`--- Queries ---\n${generatedQueries?.queries?.join(
 								"\n\n"
-							)}\n\n--- Revert queries ---\n${generateQueriesFromJSON(
-								dataDiff[path],
-								tableId,
-								pkFormat
-							)?.revertQueries?.join("\n\n")}`}
+							)}\n\n--- Revert queries ---\n${generatedQueries?.revertQueries?.join(
+								"\n\n"
+							)}`}
 							setCode={() => {}}
 						/>
 					)}

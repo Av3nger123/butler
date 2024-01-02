@@ -4,7 +4,7 @@ interface JSONData {
 	[key: string]: { [key: string]: { newValue: any; oldValue: any } };
 }
 
-interface QueryResults {
+export interface QueryResults {
 	queries: string[];
 	revertQueries: string[];
 }
