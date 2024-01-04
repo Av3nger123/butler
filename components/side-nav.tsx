@@ -21,7 +21,7 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 
 	return items?.length ? (
 		<div className="flex">
-			<ScrollArea className="w-fit h-[79vh] overflow-x-hidden overflow-y-auto p-2">
+			<ScrollArea className="w-full h-[79vh] overflow-x-hidden overflow-y-auto p-2">
 				{items.map((item) => (
 					<Link
 						key={item.name}
