@@ -222,27 +222,29 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		let pk: string[] = [];
 		if (schemaData) {
 			Object.keys(schemaData?.metadata).forEach((key) => {
-				if (schemaData.metadata[key]["isPrimary"]) {
-					pk.push(key);
+				if (key) {
+					if (schemaData.metadata[key]["isPrimary"]) {
+						pk.push(key);
+					}
+					schemas[key] = {
+						column: key,
+						dataType: `${schemaData.metadata[key]["dataType"]}${
+							schemaData.metadata[key]["maxLength"]["Valid"] === true
+								? `(${schemaData.metadata[key]["maxLength"]["Int64"]})`
+								: ""
+						}`,
+						isNullable: schemaData.metadata[key]["isNullable"],
+						columnDefault: `${
+							schemaData.metadata[key]["columnDefault"]["Valid"] === true
+								? `${schemaData.metadata[key]["columnDefault"]["String"]}`
+								: " - "
+						}`,
+						position: parseInt(schemaData.metadata[key]["position"]),
+						isPrimary: schemaData.metadata[key]["isPrimary"],
+						index: schemaData.metadata[key]["index"],
+						foreignKey: schemaData.metadata[key]["foreignKey"],
+					};
 				}
-				schemas[key] = {
-					column: key,
-					dataType: `${schemaData.metadata[key]["dataType"]}${
-						schemaData.metadata[key]["maxLength"]["Valid"] === true
-							? `(${schemaData.metadata[key]["maxLength"]["Int64"]})`
-							: ""
-					}`,
-					isNullable: schemaData.metadata[key]["isNullable"],
-					columnDefault: `${
-						schemaData.metadata[key]["columnDefault"]["Valid"] === true
-							? `${schemaData.metadata[key]["columnDefault"]["String"]}`
-							: " - "
-					}`,
-					position: parseInt(schemaData.metadata[key]["position"]),
-					isPrimary: schemaData.metadata[key]["isPrimary"],
-					index: schemaData.metadata[key]["index"],
-					foreignKey: schemaData.metadata[key]["foreignKey"],
-				};
 			});
 		}
 		let pkFormat = pk.join("~");
