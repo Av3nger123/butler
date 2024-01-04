@@ -21,6 +21,8 @@ const DynamicInput = ({
 			<SelectInput value={value} onChange={onChange} options={[true, false]} />
 		),
 		var: <ValueInput value={value} onChange={onChange} type={type} />,
+		jso: <ValueInput value={value} onChange={onChange} type={type} />,
+		tim: <ValueInput value={value} onChange={onChange} type={type} />,
 		int: (
 			<ValueInput
 				value={value}

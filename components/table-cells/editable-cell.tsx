@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { get, has } from "lodash";
 import { useTable } from "@/lib/context/table-context";
 import { cn, defaultRow, getPrimaryKey } from "@/lib/utils";
+import { Base64 } from "js-base64";
 import { DynamicInput } from "./dynamic-input";
 export function EditableCell({
 	getValue,
@@ -34,8 +35,16 @@ export function EditableCell({
 			return "update";
 		}
 	}, [row.original.primaryKey]);
+	const initialValue = useMemo(() => {
+		if (columnProps) {
+			if (columnProps["dataType"].indexOf("json") != -1) {
+				return Base64.atob(getValue());
+			}
+			return getValue();
+		}
+		return "";
+	}, [columnProps, getValue]);
 
-	const initialValue = getValue();
 	const [value, setValue] = useState(
 		has(dataDiff, `${key}.${operation}.${row.original.primaryKey}.${column.id}`)
 			? get(
@@ -55,7 +64,7 @@ export function EditableCell({
 					row.original.primaryKey,
 					column.id,
 					val,
-					row.original
+					initialValue
 				);
 			} else if (row.original.primaryKey !== defaultPrimaryKey) {
 				revertDataDiff(key, operation, row.original.primaryKey, column.id);
