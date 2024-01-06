@@ -15,7 +15,11 @@ interface ValueInputProps {
 	type: string;
 }
 
-export function ValueInput({ value, onChange, type }: ValueInputProps) {
+export function ValueInput({
+	value,
+	onChange,
+	type,
+}: Readonly<ValueInputProps>) {
 	const inputType = useMemo(() => {
 		if (type.includes("varchar")) {
 			return "text";

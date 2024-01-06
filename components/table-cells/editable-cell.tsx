@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import useDataStore from "@/lib/store/datastore";
 import { usePathname } from "next/navigation";
-import { get, has } from "lodash";
+import { get, has, isEqual } from "lodash";
 import { useTable } from "@/lib/context/table-context";
 import { cn, defaultRow, getPrimaryKey } from "@/lib/utils";
 import { Base64 } from "js-base64";
@@ -36,11 +36,12 @@ export function EditableCell({
 		}
 	}, [row.original.primaryKey]);
 	const initialValue = useMemo(() => {
+		let val = getValue();
 		if (columnProps) {
-			if (columnProps["dataType"].indexOf("json") != -1) {
-				return Base64.atob(getValue());
+			if (columnProps["dataType"].indexOf("json") != -1 && !!val) {
+				return JSON.parse(Base64.atob(val));
 			}
-			return getValue();
+			return val;
 		}
 		return "";
 	}, [columnProps, getValue]);

@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { SelectInput } from "./select-input";
 import { ValueInput } from "./value-input";
 import React from "react";
+import JsonInput from "./json-input";
 
 interface DynamicInputProps {
 	className: string;
@@ -21,7 +22,7 @@ const DynamicInput = ({
 			<SelectInput value={value} onChange={onChange} options={[true, false]} />
 		),
 		var: <ValueInput value={value} onChange={onChange} type={type} />,
-		jso: <ValueInput value={value} onChange={onChange} type={type} />,
+		jso: <JsonInput value={value} onChange={onChange} />,
 		tim: <ValueInput value={value} onChange={onChange} type={type} />,
 		int: (
 			<ValueInput
