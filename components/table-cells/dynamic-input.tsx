@@ -19,19 +19,39 @@ const DynamicInput = ({
 }: DynamicInputProps) => {
 	const componentsMap: any = {
 		boo: (
-			<SelectInput value={value} onChange={onChange} options={[true, false]} />
+			<SelectInput
+				value={value}
+				onChange={onChange}
+				options={[true, false]}
+				className={className}
+			/>
 		),
-		var: <ValueInput value={value} onChange={onChange} type={type} />,
-		jso: <JsonInput value={value} onChange={onChange} />,
-		tim: <ValueInput value={value} onChange={onChange} type={type} />,
+		var: (
+			<ValueInput
+				value={value}
+				onChange={onChange}
+				type={type}
+				className={className}
+			/>
+		),
+		jso: <JsonInput value={value} onChange={onChange} className={className} />,
+		tim: (
+			<ValueInput
+				value={value}
+				onChange={onChange}
+				type={type}
+				className={className}
+			/>
+		),
 		int: (
 			<ValueInput
 				value={value}
 				onChange={(val: string) => onChange?.(parseInt(val))}
 				type={type}
+				className={className}
 			/>
 		),
 	};
-	return <div className={className}>{componentsMap[type?.slice(0, 3)]}</div>;
+	return <div>{componentsMap[type?.slice(0, 3)]}</div>;
 };
 export { DynamicInput };

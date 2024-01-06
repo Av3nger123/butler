@@ -58,7 +58,7 @@ export function EditableCell({
 	const onChange = useCallback(
 		(val: any) => {
 			setValue(val);
-			if (initialValue !== val) {
+			if (!isEqual(initialValue, val)) {
 				setDataDiff(
 					key,
 					operation,
