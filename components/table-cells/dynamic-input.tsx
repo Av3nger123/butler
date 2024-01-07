@@ -34,6 +34,14 @@ const DynamicInput = ({
 				className={className}
 			/>
 		),
+		tex: (
+			<ValueInput
+				value={value}
+				onChange={onChange}
+				type={type}
+				className={className}
+			/>
+		),
 		jso: <JsonInput value={value} onChange={onChange} className={className} />,
 		tim: (
 			<ValueInput

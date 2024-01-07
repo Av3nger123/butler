@@ -28,11 +28,14 @@ export function SidebarNav({ items, type }: SidebarNavProps) {
 						href={path + `/${item.name}`}
 						className="flex items-start"
 					>
-						<div className={cn("pb-1")}>
+						<div className={cn("pb-1 w-full")}>
 							<h4
-								className={cn("flex w-full rounded-md p-2 hover:underline", {
-									"bg-muted": pathname === path + `/${item.name}`,
-								})}
+								className={cn(
+									"flex w-full rounded-md p-2 bg-secondary text-secondary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+									{
+										"bg-muted": pathname === path + `/${item.name}`,
+									}
+								)}
 							>
 								{item.name}
 							</h4>

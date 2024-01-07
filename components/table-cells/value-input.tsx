@@ -24,7 +24,7 @@ export function ValueInput({
 	className,
 }: Readonly<ValueInputProps>) {
 	const inputType = useMemo(() => {
-		if (type.includes("varchar")) {
+		if (type.includes("varchar") || type.includes("text")) {
 			return "text";
 		} else if (type.includes("int")) {
 			return "number";
