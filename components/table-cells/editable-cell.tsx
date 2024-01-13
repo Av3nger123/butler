@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Input } from "../ui/input";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useDataStore from "@/lib/store/datastore";
-import { usePathname } from "next/navigation";
 import { get, has, isEqual } from "lodash";
 import { useTable } from "@/lib/context/table-context";
-import { cn, defaultRow, getPrimaryKey } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Base64 } from "js-base64";
 import { DynamicInput } from "./dynamic-input";
 export function EditableCell({
@@ -16,13 +14,12 @@ export function EditableCell({
 	row: any;
 	column: any;
 }) {
-	const ref = useRef<boolean>(true);
 	const [dataDiff, setDataDiff, revertDataDiff] = useDataStore((state) => [
 		state.dataDiff,
 		state.setDataDiff,
 		state.revertDataDiff,
 	]);
-	const { key, pkFormat, schemas, defaultPrimaryKey } = useTable();
+	const { key, schemas, defaultPrimaryKey } = useTable();
 
 	const columnProps = useMemo(() => {
 		return schemas[column.id];
@@ -36,21 +33,17 @@ export function EditableCell({
 		}
 	}, [row.original.primaryKey]);
 	const initialValue = useMemo(() => {
-		let val = getValue();
-		if (columnProps) {
-			if (columnProps["dataType"].indexOf("json") != -1 && !!val) {
-				return JSON.parse(Base64.atob(val));
-			}
-			return val;
-		}
-		return "";
-	}, [columnProps, getValue]);
+		return getValue();
+	}, [getValue]);
 
 	const [value, setValue] = useState(
-		has(dataDiff, `${key}.${operation}.${row.original.primaryKey}.${column.id}`)
+		has(
+			dataDiff,
+			`${key}.${operation}.${row.original.primaryKey}.newValue.${column.id}`
+		)
 			? get(
 					dataDiff,
-					`${key}.${operation}.${row.original.primaryKey}.${column.id}`
+					`${key}.${operation}.${row.original.primaryKey}.newValue.${column.id}`
 			  )
 			: initialValue
 	);
@@ -106,10 +99,10 @@ export function EditableCell({
 
 	return (
 		<DynamicInput
-			value={value ?? ""}
+			value={value}
 			className={cn("rounded outline-current", bgColor)}
 			onChange={onChange}
-			type={columnProps && columnProps["dataType"]}
+			type={columnProps?.dataType}
 		/>
 	);
 }

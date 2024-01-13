@@ -34,6 +34,14 @@ const DynamicInput = ({
 				className={className}
 			/>
 		),
+		dat: (
+			<ValueInput
+				value={value}
+				onChange={onChange}
+				type={type}
+				className={className}
+			/>
+		),
 		tex: (
 			<ValueInput
 				value={value}
@@ -52,6 +60,14 @@ const DynamicInput = ({
 			/>
 		),
 		int: (
+			<ValueInput
+				value={value}
+				onChange={(val: string) => onChange?.(parseInt(val))}
+				type={type}
+				className={className}
+			/>
+		),
+		tin: (
 			<ValueInput
 				value={value}
 				onChange={(val: string) => onChange?.(parseInt(val))}

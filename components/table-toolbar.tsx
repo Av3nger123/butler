@@ -7,7 +7,7 @@ import {
 	Play,
 	Plus,
 	Trash2,
-	XCircle,
+	X,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import useFilterStore from "@/lib/store/filterstore";
@@ -19,27 +19,27 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import useDataStore from "@/lib/store/datastore";
-import { createHashId, defaultRow, generateQuery } from "@/lib/utils";
+import { createHashId, defaultRow } from "@/lib/utils";
 import { SQLEditor } from "./sql-editor";
 import { useQueryClient } from "@tanstack/react-query";
-import { generateQueriesFromJSON } from "@/lib/query";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "./ui/tooltip";
+import { Separator } from "./ui/separator";
 
 const TableToolbar: React.FC = () => {
 	const { filters, addFilter, clear } = useFilterStore();
-	const [dataDiff, setDataDiffRow, clearDataDiff, deleteDataDiff] =
-		useDataStore((state) => [
-			state.dataDiff,
-			state.setDataDiffRow,
-			state.clearDataDiff,
-			state.deleteDataDiff,
-		]);
+	const [setDataDiffRow, clearDataDiff, deleteDataDiff] = useDataStore(
+		(state) => [state.setDataDiffRow, state.clearDataDiff, state.deleteDataDiff]
+	);
 	const {
 		key: path,
 		selectedIds,
-		tableId,
 		schemas,
 		refetch,
-		pkFormat,
 		setData,
 		generatedQueries,
 		setPagination,
@@ -47,84 +47,143 @@ const TableToolbar: React.FC = () => {
 
 	const queryClient = useQueryClient();
 	return (
-		<div className="flex items-center justify-center mb-1 gap-1 rounded-sm p-1">
-			<Button
-				variant="secondary"
-				onClick={() => {
-					refetch();
-					queryClient.invalidateQueries({ queryKey: ["data"] });
-					setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-				}}
-			>
-				<Play className="mr-2 h-4 w-4 opacity-70" /> Refetch
-			</Button>
-			<Popover>
-				<PopoverTrigger asChild>
-					<Button variant="secondary">
-						<Eye className="mr-2 h-4 w-4 opacity-70" /> Query
-					</Button>
-				</PopoverTrigger>
-				<PopoverContent className="w-[100vh]">
-					{!!generatedQueries && (
-						<SQLEditor
-							code={`--- Queries ---\n${generatedQueries?.queries?.join(
-								"\n\n"
-							)}\n\n--- Revert queries ---\n${generatedQueries?.revertQueries?.join(
-								"\n\n"
-							)}`}
-							setCode={() => {}}
-						/>
-					)}
-				</PopoverContent>
-			</Popover>
+		<div className="flex items-center justify-center mb-1 h-10 gap-2 rounded-lg">
+			<TooltipProvider>
+				<Button
+					variant="secondary"
+					size={"icon"}
+					onClick={() => {
+						refetch();
+						queryClient.invalidateQueries({ queryKey: ["data"] });
+						setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+					}}
+				>
+					<Tooltip>
+						<TooltipTrigger>
+							<Play className="h-4 w-4" />
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Refetch</p>
+						</TooltipContent>
+					</Tooltip>
+				</Button>
+				<Separator orientation="vertical" />
 
-			<Button variant="secondary">
-				<ArrowUpFromLine className="mr-2 h-4 w-4 opacity-70" /> Commit
-			</Button>
-			<Button
-				variant="secondary"
-				onClick={() => addFilter(path)}
-				disabled={
-					typeof window !== "undefined"
-						? has(filters, path) && filters[path].length > 0
-						: false
-				}
-			>
-				<Filter className="mr-2 h-4 w-4 opacity-70" /> Filter
-			</Button>
-			<Button
-				variant="secondary"
-				onClick={() => {
-					clear(path);
-					clearDataDiff(path);
-				}}
-			>
-				<XCircle className="mr-2 h-4 w-4 opacity-70" /> Clear
-			</Button>
-			<Button
-				variant="secondary"
-				onClick={() => {
-					let defaultRowVal = defaultRow(schemas);
-					let pk = uniqueId(`${createHashId(defaultRowVal)}_`);
-					defaultRowVal = { ...defaultRowVal, primaryKey: pk };
-					setData((prev: any[]) => [defaultRowVal, ...prev]);
-					console.log(defaultRowVal);
-					setDataDiffRow(path, "add", pk, defaultRowVal);
-				}}
-			>
-				<Plus className="mr-2 h-4 w-4 opacity-70" /> Add row
-			</Button>
-			<Button
-				variant="secondary"
-				disabled={isEmpty(selectedIds)}
-				onClick={() => {
-					Object.keys(selectedIds).forEach((key) => {
-						deleteDataDiff(path, key, selectedIds[key]);
-					});
-				}}
-			>
-				<Trash2 className="mr-2 h-4 w-4 opacity-70" /> Delete row
-			</Button>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button variant="secondary" size={"icon"}>
+							<Tooltip>
+								<TooltipTrigger>
+									<Eye className="h-4 w-4" />
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Queries</p>
+								</TooltipContent>
+							</Tooltip>
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className="w-[100vh]">
+						{!!generatedQueries && (
+							<SQLEditor
+								code={`--- Queries ---\n${generatedQueries?.queries?.join(
+									"\n\n"
+								)}\n\n--- Revert queries ---\n${generatedQueries?.revertQueries?.join(
+									"\n\n"
+								)}`}
+								setCode={() => {}}
+							/>
+						)}
+					</PopoverContent>
+				</Popover>
+				<Button variant="secondary" size={"icon"}>
+					<Tooltip>
+						<TooltipTrigger>
+							<ArrowUpFromLine className="h-4 w-4" />
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Commit</p>
+						</TooltipContent>
+					</Tooltip>
+				</Button>
+				<Button
+					variant="secondary"
+					size={"icon"}
+					onClick={() => {
+						clear(path);
+						clearDataDiff(path);
+					}}
+				>
+					<Tooltip>
+						<TooltipTrigger>
+							<X className="h-4 w-4" />
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Clear</p>
+						</TooltipContent>
+					</Tooltip>
+				</Button>
+				<Separator orientation="vertical" />
+
+				<Button
+					variant="secondary"
+					size={"icon"}
+					onClick={() => addFilter(path)}
+					disabled={
+						typeof window !== "undefined"
+							? has(filters, path) && filters[path].length > 0
+							: false
+					}
+				>
+					<Tooltip>
+						<TooltipTrigger>
+							<Filter className="h-4 w-4" />
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Filter</p>
+						</TooltipContent>
+					</Tooltip>
+				</Button>
+				<Button
+					variant="secondary"
+					size={"icon"}
+					onClick={() => {
+						let defaultRowVal = defaultRow(schemas);
+						let pk = uniqueId(`${createHashId(defaultRowVal)}_`);
+						defaultRowVal = { ...defaultRowVal, primaryKey: pk };
+						setData((prev: any[]) => [defaultRowVal, ...prev]);
+						console.log(defaultRowVal);
+						setDataDiffRow(path, "add", pk, defaultRowVal);
+					}}
+				>
+					<Tooltip>
+						<TooltipTrigger>
+							<Plus className="h-4 w-4" />
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Add Row</p>
+						</TooltipContent>
+					</Tooltip>
+				</Button>
+				<Button
+					variant="secondary"
+					size={"icon"}
+					disabled={isEmpty(selectedIds)}
+					onClick={() => {
+						Object.keys(selectedIds).forEach((key) => {
+							deleteDataDiff(path, key, selectedIds[key]);
+						});
+					}}
+				>
+					<Tooltip>
+						<TooltipTrigger>
+							<Trash2 className="h-4 w-4" />
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Delete Row</p>
+						</TooltipContent>
+					</Tooltip>
+				</Button>
+			</TooltipProvider>
 		</div>
 	);
 };

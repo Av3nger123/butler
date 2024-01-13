@@ -62,13 +62,14 @@ export function TableFilter({
 	}));
 
 	return (
-		<div className="grid grid-cols-12 gap-1">
+		<div className="grid grid-cols-12 gap-1 min-w-max">
 			<div className="col-span-2 w-full">
 				<Combobox
 					type="Column"
 					items={schemaItems}
 					value={filters[path][index]["column"] ?? ""}
 					onChange={(val: any) => setColumn(path, index, val)}
+					disabled={false}
 				/>
 			</div>
 			<div className="col-span-2 w-full">
@@ -77,23 +78,24 @@ export function TableFilter({
 					items={operators}
 					value={filters[path][index]["operator"] ?? ""}
 					onChange={(val: any) => setOperator(path, index, val)}
+					disabled={false}
 				/>
 			</div>
 			<Input
-				className="col-span-6 bg-white dark:bg-black"
+				className="col-span-7 bg-white dark:bg-black"
 				type="text"
 				value={filters[path][index]["value"] ?? ""}
 				onChange={(e) => setValue(path, index, e.target.value)}
 			/>
-			<Button className="col-span-1 ml-2" onClick={() => addFilter(path)}>
-				<Plus className="mr-2 w-4 h-4" /> Add
-			</Button>
-			<Button
-				className="col-span-1 ml-2"
-				onClick={() => clearFilter(path, index)}
-			>
-				<X className="mr-2 w-6 h-6" /> Delete
-			</Button>
+
+			<div className="flex gap-2 col-span-1 ml-1">
+				<Button size={"icon"} onClick={() => addFilter(path)}>
+					<Plus className="w-4 h-4" />
+				</Button>
+				<Button size={"icon"} onClick={() => clearFilter(path, index)}>
+					<X className="w-4 h-4" />
+				</Button>
+			</div>
 		</div>
 	);
 }
