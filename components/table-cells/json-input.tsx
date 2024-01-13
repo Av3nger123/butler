@@ -53,6 +53,7 @@ export default function JsonInput({
 			<Input
 				className={cn("min-w-[200px]", className)}
 				value={JSON.stringify(value)}
+				disabled
 			/>
 			<Dialog>
 				<DialogTrigger asChild>

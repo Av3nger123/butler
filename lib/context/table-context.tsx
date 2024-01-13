@@ -4,6 +4,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
 	OnChangeFn,
 	PaginationState,
+	RowSelectionState,
 	SortingState,
 } from "@tanstack/react-table";
 import React, {
@@ -14,13 +15,14 @@ import React, {
 	useMemo,
 	useState,
 	ReactNode,
+	useCallback,
 } from "react";
 import { getApi, postApi } from "../api";
 import useClusterStore from "../store/clusterstore";
 import { Schema } from "@/types";
 import { createHashId, decrypt, defaultRow, getPrimaryKey } from "../utils";
 import useFilterStore from "../store/filterstore";
-import { has, isEmpty } from "lodash";
+import { has, isEmpty, unset } from "lodash";
 import useDataStore from "../store/datastore";
 import { dataColumns } from "@/components/data-columns";
 import { QueryResults, generateQueriesFromJSON } from "../query";
@@ -44,8 +46,8 @@ interface TableContextType {
 	count: number;
 	setPagination: Dispatch<SetStateAction<PaginationState>>;
 	sorting: SortingState;
-	rowSelection: any;
-	setRowSelection: any;
+	rowSelection: RowSelectionState;
+	setRowSelection: OnChangeFn<RowSelectionState>;
 	setSorting: OnChangeFn<SortingState>;
 }
 
@@ -68,7 +70,7 @@ const initialTableContext: TableContextType = {
 	columns: [],
 	setPagination: () => {},
 	sorting: [],
-	rowSelection: null,
+	rowSelection: {},
 	setRowSelection: () => {},
 	setSorting: () => {},
 };
@@ -100,7 +102,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		queries: [],
 		revertQueries: [],
 	});
-	const [rowSelection, setRowSelection] = useState({});
+	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 	const [selectedIndex, setSelectedIndex] = useState({});
 	const [selectedIds, setSelectedIds] = useState<{ [key: string]: any }>({});
 	const [sorting, setSorting] = useState<SortingState>([]);
@@ -110,26 +112,35 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		pageIndex: 0,
 		pageSize: 10,
 	});
-
-	useEffect(() => {
-		Object.keys(rowSelection).forEach((value) => {
-			let val = parseInt(value);
-			let final = val + pageSize * pageIndex;
-			setSelectedIndex((prev) => ({ ...prev, [final]: val }));
-		});
-	}, [rowSelection]);
+	const handleRowSelectionChange = (fn: any) => {
+		let change = fn();
+		setRowSelection(fn);
+		let diff: any = { ...selectedIndex };
+		for (let i = 0; i < pageSize; i++) {
+			let j = i + pageIndex * pageSize;
+			if (has(change, i)) {
+				diff[j] = true;
+			} else if (!has(change, i) && has(diff, j)) {
+				unset(diff, j);
+			}
+		}
+		setSelectedIndex((prev) => ({ ...prev, ...diff }));
+	};
 
 	useEffect(() => {
 		let finalState: any = {};
-		Object.keys(selectedIndex).forEach((value) => {
-			let val = parseInt(value);
-			let final = val - pageSize * pageIndex;
-			if (final > 0 && final < pageSize) {
-				finalState[final] = true;
+		for (let i = pageIndex * pageSize; i < (pageIndex + 1) * pageSize; i++) {
+			let j = i - pageSize * pageIndex;
+			console.log(selectedIndex);
+			if (has(selectedIndex, i)) {
+				console.log(j);
+				finalState[j] = true;
 			}
-			setRowSelection(finalState);
-		});
+		}
+		console.log(finalState);
+		setRowSelection(finalState);
 	}, [pageIndex, pageSize]);
+
 	const { data: queryData } = useQuery({
 		queryKey: ["queries", clusterId, databaseId, tableId],
 		queryFn: async () => {
@@ -313,7 +324,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 				setPagination: setPagination,
 				sorting: sorting,
 				rowSelection: rowSelection,
-				setRowSelection: setRowSelection,
+				setRowSelection: handleRowSelectionChange,
 				setSorting: setSorting,
 			};
 		}
@@ -323,6 +334,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		data,
 		databaseId,
 		defaultPrimaryKey,
+		setPagination,
 		key,
 		pageIndex,
 		pageSize,
