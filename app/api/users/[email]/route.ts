@@ -8,7 +8,9 @@ export async function GET(
 	{ params }: { params: { email: string } }
 ) {
 	const session = await getServerSession(authOptions);
-
+	if (!session) {
+		return Response.json({});
+	}
 	const user = await prisma.user.findFirst({
 		where: {
 			email: params.email,
@@ -29,5 +31,10 @@ export async function GET(
 			},
 		},
 	});
-	return Response.json({ user });
+	const account = await prisma.account.findFirst({
+		where: {
+			userId: user?.id,
+		},
+	});
+	return Response.json({ user, account });
 }

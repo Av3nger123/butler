@@ -10,7 +10,6 @@ import {
 import { useGetCommits, useGetTables } from "@/hooks/databases";
 import { getApi, postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
-import { decrypt } from "@/lib/utils";
 import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";

@@ -65,7 +65,8 @@ export function AppBar() {
 					name: user?.name,
 					username: user?.username,
 				},
-				permissions
+				permissions,
+				res?.account
 			);
 			return res;
 		},

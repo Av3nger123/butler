@@ -1,7 +1,7 @@
 // store.js
 import { StateCreator, create } from "zustand";
 import { StorageValue, persist } from "zustand/middleware";
-import { encrypt, decrypt } from "@/lib/utils";
+import { encrypt, decrypt } from "@/lib/encryption";
 import { DatabaseCluster } from "@/types";
 
 interface ClusterStoreState {

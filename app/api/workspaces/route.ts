@@ -5,6 +5,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
 	const session = await getServerSession(authOptions);
+
 	const dbUser = await prisma.user.findFirst({
 		where: {
 			email: session?.user?.email,

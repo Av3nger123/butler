@@ -20,7 +20,7 @@ import React, {
 import { getApi, postApi } from "../api";
 import useClusterStore from "../store/clusterstore";
 import { Schema } from "@/types";
-import { createHashId, decrypt, defaultRow, getPrimaryKey } from "../utils";
+import { createHashId, defaultRow, getPrimaryKey } from "../utils";
 import useFilterStore from "../store/filterstore";
 import { has, isEmpty, unset } from "lodash";
 import useDataStore from "../store/datastore";
@@ -131,7 +131,6 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		let finalState: any = {};
 		for (let i = pageIndex * pageSize; i < (pageIndex + 1) * pageSize; i++) {
 			let j = i - pageSize * pageIndex;
-			console.log(selectedIndex);
 			if (has(selectedIndex, i)) {
 				console.log(j);
 				finalState[j] = true;
@@ -154,17 +153,11 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	const { data: schemaData } = useQuery({
 		queryKey: ["schema", clusterId, databaseId, tableId],
 		queryFn: async () => {
-			if (cluster)
-				return await postApi(
-					`http://localhost:8080/metadata`,
-					JSON.stringify({
-						...cluster,
-						port: parseInt(cluster.port),
-						password: decrypt(cluster.password),
-						database: databaseId,
-						table: tableId,
-					})
+			if (cluster) {
+				return await getApi(
+					`http://localhost:8080/metadata/${cluster?.id}?db=${databaseId}&table=${tableId}`
 				);
+			}
 		},
 		enabled: !!cluster,
 	});
@@ -185,7 +178,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		],
 		queryFn: async () => {
 			if (cluster) {
-				let url = `http://localhost:8080/data?page=${pageIndex}&size=${pageSize}`;
+				let url = `http://localhost:8080/data/${clusterId}?page=${pageIndex}&size=${pageSize}&db=${databaseId}&table=${tableId}`;
 				if (has(filters, key)) {
 					let filterStrings: string[] = [];
 					filters[key].forEach((filter) => {
@@ -203,16 +196,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 						sorting[0].desc ? "desc" : "asc"
 					}`;
 				}
-				return await postApi(
-					url,
-					JSON.stringify({
-						...cluster,
-						port: parseInt(cluster.port),
-						password: decrypt(cluster.password),
-						database: databaseId,
-						table: tableId,
-					})
-				);
+				return await getApi(url);
 			}
 		},
 		enabled: !!cluster,

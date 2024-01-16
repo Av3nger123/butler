@@ -25,7 +25,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { decrypt, encrypt } from "@/lib/utils";
+import { decrypt, encrypt } from "@/lib/encryption";
 import { postApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
 import useUserStore from "@/lib/store/userstore";

@@ -49,15 +49,17 @@ import { DatabaseForm } from "./database-form";
 import Link from "next/link";
 import { DatabaseCluster } from "@/types";
 import { Skeleton } from "./ui/skeleton";
-import { deleteApi, postApi } from "@/lib/api";
+import { deleteApi, getApi, postApi } from "@/lib/api";
 import useClusterStore from "@/lib/store/clusterstore";
 import useUserStore from "@/lib/store/userstore";
 import { useToast } from "./ui/use-toast";
 import { toast } from "sonner";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { decrypt } from "@/lib/utils";
 import { redirect } from "next/navigation";
+import { decrypt } from "@/lib/encryption";
+import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 
 interface DatabaseCardProps {
 	databaseCluster: DatabaseCluster;
@@ -75,7 +77,11 @@ export function DatabaseCard({
 	databaseCluster,
 	refetch,
 }: Readonly<DatabaseCardProps>) {
-	const permissions = useUserStore((state) => state.permissions);
+	const [permissions, account] = useUserStore((state) => [
+		state.permissions,
+		state.account,
+	]);
+	const { data: session } = useSession();
 	const { cluster, setCluster } = useClusterStore();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
@@ -93,14 +99,9 @@ export function DatabaseCard({
 		setLoading(true);
 		setError(false);
 		setSuccess(false);
-		postApi(
-			"http://localhost:8080/ping",
-			JSON.stringify({
-				...databaseCluster,
-				port: parseInt(databaseCluster.port),
-				password: decrypt(databaseCluster.password),
-			})
-		)
+		getApi(`http://localhost:8080/ping/${databaseCluster?.id}`, {
+			Authorization: account?.access_token,
+		})
 			.then((response) => {
 				if (response.error) {
 					setError(true);

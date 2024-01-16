@@ -1,21 +1,15 @@
 import { getApi, postApi } from "@/lib/api";
-import { decrypt } from "@/lib/utils";
 import { DatabaseCluster } from "@/types";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
 export const useGetDatabases = (cluster: DatabaseCluster | null) => {
 	return useQuery({
 		queryKey: ["databases", cluster?.id],
 		queryFn: async () => {
-			if (cluster)
-				return await postApi(
-					"http://localhost:8080/databases",
-					JSON.stringify({
-						...cluster,
-						port: parseInt(cluster.port),
-						password: decrypt(cluster.password),
-					})
-				);
+			if (cluster) {
+				return await getApi(`http://localhost:8080/databases/${cluster.id}`);
+			}
 		},
 		enabled: !!cluster,
 	});
@@ -28,16 +22,11 @@ export const useGetTables = (
 	return useQuery({
 		queryKey: ["tables", cluster?.id, database],
 		queryFn: async () => {
-			if (cluster)
-				return await postApi(
-					"http://localhost:8080/tables",
-					JSON.stringify({
-						...cluster,
-						port: parseInt(cluster.port),
-						password: decrypt(cluster.password),
-						database: database,
-					})
+			if (cluster) {
+				return await getApi(
+					`http://localhost:8080/tables/${cluster?.id}?db=${database}`
 				);
+			}
 		},
 		enabled: !!cluster,
 	});

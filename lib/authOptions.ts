@@ -25,10 +25,9 @@ export const authOptions: NextAuthOptions = {
 				session.user.email = token.email;
 				session.user.image = token.picture;
 			}
-
 			return { ...session, username: token?.username };
 		},
-		async jwt({ token, user, profile }) {
+		async jwt({ token, user, profile, account }) {
 			let dbUser = await prisma.user.findFirst({
 				where: {
 					email: token.email,
@@ -39,6 +38,7 @@ export const authOptions: NextAuthOptions = {
 				if (profile) {
 					token.id = user?.id;
 					token.username = profile?.login;
+					token.accessToken = account?.access_token;
 				}
 				return token;
 			}
@@ -51,7 +51,6 @@ export const authOptions: NextAuthOptions = {
 					id: dbUser.id,
 				},
 			});
-
 			return {
 				id: dbUser.id,
 				name: dbUser.name,
