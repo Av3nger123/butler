@@ -17,65 +17,41 @@ const DynamicInput = ({
 	value,
 	onChange,
 }: DynamicInputProps) => {
-	const componentsMap: any = {
-		boo: (
-			<SelectInput
-				value={value}
-				onChange={onChange}
-				options={[true, false]}
-				className={className}
-			/>
-		),
-		var: (
-			<ValueInput
-				value={value}
-				onChange={onChange}
-				type={type}
-				className={className}
-			/>
-		),
-		dat: (
-			<ValueInput
-				value={value}
-				onChange={onChange}
-				type={type}
-				className={className}
-			/>
-		),
-		tex: (
-			<ValueInput
-				value={value}
-				onChange={onChange}
-				type={type}
-				className={className}
-			/>
-		),
-		jso: <JsonInput value={value} onChange={onChange} className={className} />,
-		tim: (
-			<ValueInput
-				value={value}
-				onChange={onChange}
-				type={type}
-				className={className}
-			/>
-		),
-		int: (
-			<ValueInput
-				value={value}
-				onChange={(val: string) => onChange?.(parseInt(val))}
-				type={type}
-				className={className}
-			/>
-		),
-		tin: (
-			<ValueInput
-				value={value}
-				onChange={(val: string) => onChange?.(parseInt(val))}
-				type={type}
-				className={className}
-			/>
-		),
+	const component = (type: string) => {
+		if (type.includes("json")) {
+			return (
+				<JsonInput value={value} onChange={onChange} className={className} />
+			);
+		} else if (type.includes("int")) {
+			return (
+				<ValueInput
+					value={value}
+					onChange={(val: string) => onChange?.(parseInt(val))}
+					type={type}
+					className={className}
+				/>
+			);
+		} else if (type.includes("bool")) {
+			return (
+				<SelectInput
+					value={value}
+					onChange={onChange}
+					options={[true, false]}
+					className={className}
+				/>
+			);
+		} else {
+			return (
+				<ValueInput
+					value={value}
+					onChange={onChange}
+					type={type}
+					className={className}
+				/>
+			);
+		}
 	};
-	return <div>{componentsMap[type?.slice(0, 3)]}</div>;
+	const componentsMap: any = {};
+	return <div>{component(type)}</div>;
 };
 export { DynamicInput };

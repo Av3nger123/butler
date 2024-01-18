@@ -101,11 +101,7 @@ export function DataTable<TData, TValue>({
 							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => {
 									return (
-										<TableHead
-											key={header.id}
-											className="border relative"
-											style={{ width: header.getSize() }}
-										>
+										<TableHead key={header.id} className="border relative">
 											{header.isPlaceholder
 												? null
 												: flexRender(
