@@ -99,9 +99,12 @@ export function DatabaseCard({
 		setLoading(true);
 		setError(false);
 		setSuccess(false);
-		getApi(`http://localhost:8080/ping/${databaseCluster?.id}`, {
-			Authorization: account?.access_token,
-		})
+		getApi(
+			`${process.env.NEXT_PUBLIC_SERVER_URL}/ping/${databaseCluster?.id}`,
+			{
+				Authorization: account?.access_token,
+			}
+		)
 			.then((response) => {
 				if (response.error) {
 					setError(true);

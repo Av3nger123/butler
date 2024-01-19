@@ -155,7 +155,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		queryFn: async () => {
 			if (cluster) {
 				return await getApi(
-					`http://localhost:8080/metadata/${cluster?.id}?db=${databaseId}&table=${tableId}`
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/metadata/${cluster?.id}?db=${databaseId}&table=${tableId}`
 				);
 			}
 		},
@@ -178,7 +178,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		],
 		queryFn: async () => {
 			if (cluster) {
-				let url = `http://localhost:8080/data/${clusterId}?page=${pageIndex}&size=${pageSize}&db=${databaseId}&table=${tableId}`;
+				let url = `${process.env.NEXT_PUBLIC_SERVER_URL}/data/${clusterId}?page=${pageIndex}&size=${pageSize}&db=${databaseId}&table=${tableId}`;
 				if (has(filters, key)) {
 					let filterStrings: string[] = [];
 					filters[key].forEach((filter) => {

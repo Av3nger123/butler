@@ -24,7 +24,7 @@ export const useGetTables = (
 		queryFn: async () => {
 			if (cluster) {
 				return await getApi(
-					`http://localhost:8080/tables/${cluster?.id}?db=${database}`
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/tables/${cluster?.id}?db=${database}`
 				);
 			}
 		},
