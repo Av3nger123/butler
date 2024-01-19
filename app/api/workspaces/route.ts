@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 	}
 
 	const workspaces = dbUser?.WorkspaceUser.map(
-		(workspaceRelation) => workspaceRelation.workspace
+		(workspaceRelation: any) => workspaceRelation.workspace
 	);
 
 	return Response.json({ workspaces });
