@@ -1,6 +1,5 @@
 "use client";
 import { SidebarNav } from "@/components/side-nav";
-import { decrypt } from "@/lib/utils";
 import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
