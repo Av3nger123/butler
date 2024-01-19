@@ -1,6 +1,5 @@
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
-import { WorkspaceUser } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 

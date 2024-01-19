@@ -131,7 +131,7 @@ export function AppBar() {
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
-				<Label>{session?.username}</Label>
+				<Label>{session?.user?.name}</Label>
 				<ModeToggle />
 			</div>
 		</div>

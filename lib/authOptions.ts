@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
 				session.user.email = token.email;
 				session.user.image = token.picture;
 			}
-			return { ...session, username: token?.username };
+			return { ...session };
 		},
 		async jwt({ token, user, profile, account }) {
 			let dbUser = await prisma.user.findFirst({
@@ -37,20 +37,10 @@ export const authOptions: NextAuthOptions = {
 			if (!dbUser) {
 				if (profile) {
 					token.id = user?.id;
-					token.username = profile?.login;
 					token.accessToken = account?.access_token;
 				}
 				return token;
 			}
-
-			await prisma.user.update({
-				data: {
-					username: profile?.login,
-				},
-				where: {
-					id: dbUser.id,
-				},
-			});
 			return {
 				id: dbUser.id,
 				name: dbUser.name,
