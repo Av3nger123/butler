@@ -48,6 +48,7 @@
 		"@tanstack/react-table": "^8.10.7",
 		"@types/crypto-js": "^4.2.1",
 		"@uiw/react-textarea-code-editor": "^2.1.9",
+		"axios": "^1.6.5",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.0.0",
 		"cmdk": "^0.2.0",

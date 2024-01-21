@@ -1,32 +1,26 @@
+import axios from "axios";
+
 export async function getApi(url: string, headers: any = {}) {
-	return await fetch(url, { headers, credentials: "include" }).then(
-		async (result) => {
-			return await result.json();
-		}
-	);
+	const response = await axios.get(url, { headers, withCredentials: true });
+	return response.data;
 }
 
 export async function deleteApi(url: string, body: string, headers: any = {}) {
-	return await fetch(url, {
-		method: "DELETE",
-		body,
+	const response = await axios.delete(url, {
+		data: body,
 		headers,
-		credentials: "include",
-	}).then(async (result) => {
-		return await result.json();
+		withCredentials: true,
 	});
+	return response.data;
 }
 
 export async function postApi(url: string, body: string, headers: any = {}) {
-	return await fetch(url, {
-		method: "POST",
+	const response = await axios.post(url, body, {
 		headers: {
 			"Content-Type": "application/json",
 			...headers,
 		},
-		credentials: "include",
-		body,
-	}).then(async (result) => {
-		return await result.json();
+		withCredentials: true,
 	});
+	return response.data;
 }
