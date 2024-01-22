@@ -8,7 +8,7 @@ export const useGetDatabases = (cluster: DatabaseCluster | null) => {
 		queryKey: ["databases", cluster?.id],
 		queryFn: async () => {
 			if (cluster) {
-				return await getApi(`http://localhost:8080/databases/${cluster.id}`);
+				return await getApi(`${process.env.NEXT_PUBLIC_SERVER_URL}/databases/${cluster.id}`);
 			}
 		},
 		enabled: !!cluster,
