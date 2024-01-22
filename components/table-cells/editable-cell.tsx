@@ -3,17 +3,16 @@ import useDataStore from "@/lib/store/datastore";
 import { get, has, isEqual } from "lodash";
 import { useTable } from "@/lib/context/table-context";
 import { cn } from "@/lib/utils";
-import { Base64 } from "js-base64";
 import { DynamicInput } from "./dynamic-input";
 export function EditableCell({
 	getValue,
 	row,
 	column,
-}: {
+}: Readonly<{
 	getValue: any;
 	row: any;
 	column: any;
-}) {
+}>) {
 	const [dataDiff, setDataDiff, revertDataDiff] = useDataStore((state) => [
 		state.dataDiff,
 		state.setDataDiff,
@@ -62,6 +61,7 @@ export function EditableCell({
 				);
 			} else if (row.original.primaryKey !== defaultPrimaryKey) {
 				revertDataDiff(key, operation, row.original.primaryKey, column.id);
+				setValue(initialValue);
 			}
 		},
 		[
