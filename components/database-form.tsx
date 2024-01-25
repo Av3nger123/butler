@@ -30,6 +30,8 @@ import { postApi } from "@/lib/api";
 import useWorkspaceStore from "@/lib/store/workspacestore";
 import useUserStore from "@/lib/store/userstore";
 import { toast } from "sonner";
+import { useWorkspace } from "@/lib/context/workspace-context";
+import { Cluster } from "@prisma/client";
 
 const databaseSchema = z.object({
 	name: z.string().min(2, {
@@ -51,10 +53,6 @@ const databaseSchema = z.object({
 		message: "Username must be at least 2 characters.",
 	}),
 });
-interface DatabaseFormProps {
-	databaseCluster: DatabaseCluster | null;
-	refetch: Function;
-}
 
 const portTypes: { [key in DatabaseCluster["type"]]: string } = {
 	postgres: "5432",
@@ -62,23 +60,19 @@ const portTypes: { [key in DatabaseCluster["type"]]: string } = {
 	sqllite: "8191",
 };
 
-export function DatabaseForm({
-	databaseCluster,
-	refetch,
-}: Readonly<DatabaseFormProps>) {
+export function DatabaseForm({ cluster }: { cluster: DatabaseCluster | null }) {
+	const { refetch } = useWorkspace();
 	const permissions = useUserStore((state) => state.permissions);
 	const workspace = useWorkspaceStore((state) => state.workspace);
 	const form = useForm<z.infer<typeof databaseSchema>>({
 		resolver: zodResolver(databaseSchema),
 		defaultValues: {
-			name: databaseCluster?.name,
-			host: databaseCluster?.host,
-			port: databaseCluster?.port,
-			username: databaseCluster?.username,
-			password: databaseCluster?.password
-				? decrypt(databaseCluster?.password)
-				: "",
-			type: databaseCluster?.type,
+			name: cluster?.name,
+			host: cluster?.host,
+			port: cluster?.port,
+			username: cluster?.username,
+			password: cluster?.password ? decrypt(cluster?.password) : "",
+			type: cluster?.type,
 		},
 	});
 
@@ -90,8 +84,8 @@ export function DatabaseForm({
 			return toast.error("You are not authorized to add/edit the cluster");
 		} else {
 			let request: any = { ...values };
-			if (databaseCluster) {
-				request["id"] = databaseCluster?.id;
+			if (cluster) {
+				request["id"] = cluster?.id;
 			}
 			request["workspace_id"] = workspace?.id;
 			request["password"] = encrypt(values.password);
@@ -180,9 +174,7 @@ export function DatabaseForm({
 									<Input
 										type="text"
 										placeholder={
-											databaseCluster?.type
-												? String(portTypes[databaseCluster.type])
-												: ""
+											cluster?.type ? String(portTypes[cluster.type]) : ""
 										}
 										{...field}
 									/>

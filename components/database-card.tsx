@@ -156,10 +156,7 @@ export function DatabaseCard({
 									when you&apos;re done.
 								</DialogDescription>
 							</DialogHeader>
-							<DatabaseForm
-								databaseCluster={databaseCluster}
-								refetch={refetch}
-							/>
+							<DatabaseForm cluster={databaseCluster} />
 						</DialogContent>
 					</Dialog>
 					<AlertDialog>

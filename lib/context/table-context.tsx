@@ -112,31 +112,27 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		pageIndex: 0,
 		pageSize: 10,
 	});
-	const handleRowSelectionChange = (fn: any) => {
-		let change = fn();
-		setRowSelection(fn);
+	useEffect(() => {
 		let diff: any = { ...selectedIndex };
 		for (let i = 0; i < pageSize; i++) {
 			let j = i + pageIndex * pageSize;
-			if (has(change, i)) {
+			if (has(rowSelection, i)) {
 				diff[j] = true;
-			} else if (!has(change, i) && has(diff, j)) {
+			} else if (!has(rowSelection, i) && has(diff, j)) {
 				unset(diff, j);
 			}
 		}
-		setSelectedIndex((prev) => ({ ...prev, ...diff }));
-	};
+		setSelectedIndex(diff);
+	}, [rowSelection]);
 
 	useEffect(() => {
 		let finalState: any = {};
 		for (let i = pageIndex * pageSize; i < (pageIndex + 1) * pageSize; i++) {
 			let j = i - pageSize * pageIndex;
 			if (has(selectedIndex, i)) {
-				console.log(j);
 				finalState[j] = true;
 			}
 		}
-		console.log(finalState);
 		setRowSelection(finalState);
 	}, [pageIndex, pageSize]);
 
@@ -308,7 +304,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 				setPagination: setPagination,
 				sorting: sorting,
 				rowSelection: rowSelection,
-				setRowSelection: handleRowSelectionChange,
+				setRowSelection: setRowSelection,
 				setSorting: setSorting,
 			};
 		}

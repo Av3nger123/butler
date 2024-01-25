@@ -13,30 +13,12 @@ import useClusterStore from "@/lib/store/clusterstore";
 import { SidebarNavItem } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SQLQuery } from "@/components/sql-query";
+import { useDatabase } from "@/lib/context/database-context";
 
-export default function Page({
-	params,
-}: Readonly<{
-	params: {
-		databaseId: string;
-		clusterId: string;
-	};
-}>) {
-	const { cluster } = useClusterStore();
-
-	const { data: DatabaseTables } = useGetTables(cluster, params.databaseId);
-
-	const { data: DatabaseCommits } = useGetCommits(cluster, params.databaseId);
-
-	const tables = useMemo(() => {
-		let tables: SidebarNavItem[] = [];
-
-		DatabaseTables?.tables?.forEach((database: string) => {
-			tables.push({ name: database });
-		});
-		return tables;
-	}, [DatabaseTables]);
-
+export default function Page() {
+	const { tables, commits } = useDatabase();
 	return (
 		<ResizablePanelGroup direction="horizontal" className="min-h-[79vh] border">
 			<ResizablePanel defaultSize={15}>
@@ -49,7 +31,20 @@ export default function Page({
 			</ResizablePanel>
 			<ResizableHandle withHandle />
 			<ResizablePanel defaultSize={85}>
-				<Commits commits={DatabaseCommits?.commits} />
+				<div className="p-2">
+					<Tabs defaultValue="sql" className="w-full h-full">
+						<TabsList>
+							<TabsTrigger value="sql">SQL</TabsTrigger>
+							<TabsTrigger value="commits">Commits</TabsTrigger>
+						</TabsList>
+						<TabsContent value="sql">
+							<SQLQuery />
+						</TabsContent>
+						<TabsContent value="commits">
+							<Commits commits={commits} />
+						</TabsContent>
+					</Tabs>
+				</div>
 			</ResizablePanel>
 		</ResizablePanelGroup>
 	);

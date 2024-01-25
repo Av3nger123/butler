@@ -8,7 +8,9 @@ export const useGetDatabases = (cluster: DatabaseCluster | null) => {
 		queryKey: ["databases", cluster?.id],
 		queryFn: async () => {
 			if (cluster) {
-				return await getApi(`${process.env.NEXT_PUBLIC_SERVER_URL}/databases/${cluster.id}`);
+				return await getApi(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/databases/${cluster.id}`
+				);
 			}
 		},
 		enabled: !!cluster,
@@ -22,7 +24,7 @@ export const useGetTables = (
 	return useQuery({
 		queryKey: ["tables", cluster?.id, database],
 		queryFn: async () => {
-			if (cluster) {
+			if (cluster && database) {
 				return await getApi(
 					`${process.env.NEXT_PUBLIC_SERVER_URL}/tables/${cluster?.id}?db=${database}`
 				);
@@ -39,9 +41,11 @@ export const useGetCommits = (
 	return useQuery({
 		queryKey: ["queries", cluster?.id, database],
 		queryFn: async () => {
-			return await getApi(
-				`/api/clusters/${cluster?.id}/commits?databaseId=${database}`
-			);
+			if (cluster && database) {
+				return await getApi(
+					`/api/clusters/${cluster?.id}/commits?databaseId=${database}`
+				);
+			}
 		},
 		enabled: !!cluster,
 	});

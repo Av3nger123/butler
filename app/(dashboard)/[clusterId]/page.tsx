@@ -10,6 +10,7 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { useCluster } from "@/lib/context/cluster-context";
 
 export default function ClusterPage({
 	params,
@@ -18,19 +19,7 @@ export default function ClusterPage({
 		clusterId: string;
 	};
 }>) {
-	const { cluster } = useClusterStore();
-
-	const { data: ClusterDatabases } = useGetDatabases(cluster);
-
-	const databases = useMemo(() => {
-		let databases: SidebarNavItem[] = [];
-
-		ClusterDatabases?.databases.forEach((database: string) => {
-			databases.push({ name: database });
-		});
-		return databases;
-	}, [ClusterDatabases]);
-
+	const { databases } = useCluster();
 	return (
 		<ResizablePanelGroup direction="horizontal" className="min-h-[79vh] border">
 			<ResizablePanel defaultSize={15}>
