@@ -35,6 +35,18 @@ model Commit {
     @@map("commits")
 }
 
+model View {
+    id         Int      @id @default(autoincrement())
+    title      String
+    createdAt  DateTime @default(now())
+    clusterId  String
+    databaseId String
+    tableId    String
+    query      String
+
+    @@map("view")
+}
+
 model Workspace {
     id            Int             @id @default(autoincrement())
     name          String          @db.VarChar(255)
