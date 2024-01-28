@@ -57,7 +57,7 @@ export function EditableCell({
 					row.original.primaryKey,
 					column.id,
 					val,
-					initialValue
+					row.original
 				);
 			} else if (row.original.primaryKey !== defaultPrimaryKey) {
 				revertDataDiff(key, operation, row.original.primaryKey, column.id);

@@ -151,7 +151,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		queryFn: async () => {
 			if (cluster) {
 				return await getApi(
-					`${process.env.NEXT_PUBLIC_SERVER_URL}/metadata/${cluster?.id}?db=${databaseId}&table=${tableId}`
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/cluster/metadata/${cluster?.id}?db=${databaseId}&table=${tableId}`
 				);
 			}
 		},
@@ -174,7 +174,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		],
 		queryFn: async () => {
 			if (cluster) {
-				let url = `${process.env.NEXT_PUBLIC_SERVER_URL}/data/${clusterId}?page=${pageIndex}&size=${pageSize}&db=${databaseId}&table=${tableId}`;
+				let url = `${process.env.NEXT_PUBLIC_SERVER_URL}/cluster/data/${clusterId}?page=${pageIndex}&size=${pageSize}&db=${databaseId}&table=${tableId}`;
 				if (has(filters, key)) {
 					let filterStrings: string[] = [];
 					filters[key].forEach((filter) => {
@@ -251,7 +251,9 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	}, [clusterId, databaseId, tableId]);
 
 	useEffect(() => {
-		setQueries(generateQueriesFromJSON(dataDiff[key], tableId, pk));
+		let queries = generateQueriesFromJSON(dataDiff[key], tableId, pk);
+		console.log(queries);
+		setQueries(queries);
 	}, [dataDiff, key, pk, tableId]);
 
 	useEffect(() => {
@@ -270,6 +272,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 			);
 			data = newRows.concat(data);
 		}
+		console.log(data);
 		setData(data);
 	}, [dataDiff, key, pk, tableData]);
 

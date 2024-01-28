@@ -3,18 +3,20 @@
 import React, { useContext, useMemo, ReactNode } from "react";
 import { useGetClusters } from "@/hooks/cluster";
 import useClusterStore from "../store/clusterstore";
-import { useGetCommits, useGetTables } from "@/hooks/databases";
+import { useGetCommits, useGetTables, useGetViews } from "@/hooks/databases";
 import { usePathname } from "next/navigation";
 
 interface DatabaseContextType {
 	tables: any[];
 	commits: any[];
+	views: any[];
 	database: string;
 }
 
 const initialDatabaseContext: DatabaseContextType = {
 	tables: [],
 	commits: [],
+	views: [],
 	database: "",
 };
 
@@ -49,13 +51,21 @@ const DatabaseContextProvider: React.FC<DatabaseContextProviderProps> = ({
 
 	const { data: DatabaseCommits } = useGetCommits(cluster, database);
 
+	const { data: DatabaseViews } = useGetViews(cluster, database);
+
 	const value = useMemo(() => {
 		return {
 			tables: DatabaseTables?.tables?.map((table: string) => ({ name: table })),
 			commits: DatabaseCommits?.commits,
 			database: database,
+			views: DatabaseViews?.views,
 		};
-	}, [DatabaseTables?.tables, DatabaseCommits?.commits, database]);
+	}, [
+		DatabaseTables?.tables,
+		DatabaseCommits?.commits,
+		database,
+		DatabaseViews?.views,
+	]);
 	return (
 		<DatabaseContext.Provider value={value}>
 			{children}

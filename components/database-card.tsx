@@ -100,7 +100,7 @@ export function DatabaseCard({
 		setError(false);
 		setSuccess(false);
 		getApi(
-			`${process.env.NEXT_PUBLIC_SERVER_URL}/ping/${databaseCluster?.id}`,
+			`${process.env.NEXT_PUBLIC_SERVER_URL}/cluster/ping/${databaseCluster?.id}`,
 			{
 				Authorization: account?.access_token,
 			}

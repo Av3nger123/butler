@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/popover";
 import useDataStore from "@/lib/store/datastore";
 import { createHashId, defaultRow } from "@/lib/utils";
-import { SQLEditor } from "./sql-editor";
 import { useQueryClient } from "@tanstack/react-query";
 import {
 	Tooltip,
@@ -29,6 +28,7 @@ import {
 	TooltipTrigger,
 } from "./ui/tooltip";
 import { Separator } from "./ui/separator";
+import { SQLQuery } from "./sql-query";
 
 const TableToolbar: React.FC = () => {
 	const { filters, addFilter, clear } = useFilterStore();
@@ -84,13 +84,12 @@ const TableToolbar: React.FC = () => {
 					</PopoverTrigger>
 					<PopoverContent className="w-[100vh]">
 						{!!generatedQueries && (
-							<SQLEditor
-								code={`--- Queries ---\n${generatedQueries?.queries?.join(
+							<SQLQuery
+								value={`--- Queries ---\n${generatedQueries?.queries?.join(
 									"\n\n"
 								)}\n\n--- Revert queries ---\n${generatedQueries?.revertQueries?.join(
 									"\n\n"
 								)}`}
-								setCode={() => {}}
 							/>
 						)}
 					</PopoverContent>

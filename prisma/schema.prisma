@@ -29,10 +29,19 @@ model Commit {
     executedAt DateTime
     clusterId  String
     databaseId String
-    tableId    String
-    sqlQuery   String
+    queryIds   String[]
 
     @@map("commits")
+}
+
+model Query {
+    id         Int      @id @default(autoincrement())
+    query      String   @db.Text
+    tableId    String
+    createdAt  DateTime @default(now())
+    executedAt DateTime
+
+    @@map("queries")
 }
 
 model View {
@@ -41,10 +50,9 @@ model View {
     createdAt  DateTime @default(now())
     clusterId  String
     databaseId String
-    tableId    String
     query      String
 
-    @@map("view")
+    @@map("dataviews")
 }
 
 model Workspace {

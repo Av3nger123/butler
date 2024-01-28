@@ -9,7 +9,7 @@ export const useGetDatabases = (cluster: DatabaseCluster | null) => {
 		queryFn: async () => {
 			if (cluster) {
 				return await getApi(
-					`${process.env.NEXT_PUBLIC_SERVER_URL}/databases/${cluster.id}`
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/cluster/databases/${cluster.id}`
 				);
 			}
 		},
@@ -26,7 +26,24 @@ export const useGetTables = (
 		queryFn: async () => {
 			if (cluster && database) {
 				return await getApi(
-					`${process.env.NEXT_PUBLIC_SERVER_URL}/tables/${cluster?.id}?db=${database}`
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/cluster/tables/${cluster?.id}?db=${database}`
+				);
+			}
+		},
+		enabled: !!cluster,
+	});
+};
+
+export const useGetViews = (
+	cluster: DatabaseCluster | null,
+	database: string
+) => {
+	return useQuery({
+		queryKey: ["views", cluster?.id, database],
+		queryFn: async () => {
+			if (cluster && database) {
+				return await getApi(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/views?clusterId=${cluster?.id}&databaseId=${database}`
 				);
 			}
 		},
