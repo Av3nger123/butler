@@ -25,20 +25,9 @@ export default function Page({
 				tableId={params.tableId}
 				databaseId={params.databaseId}
 			>
-				<Tabs defaultValue="data" className="w-full h-full">
-					<TabsList>
-						<TabsTrigger value="data">Table</TabsTrigger>
-						<TabsTrigger value="commits">Commits</TabsTrigger>
-					</TabsList>
-					<TabsContent value="data">
-						<TableToolbarNoSSR />
-						<FiltersNoSSR />
-						<DataTable filterColumn={null} />
-					</TabsContent>
-					<TabsContent value="commits">
-						<Commits commits={[]} />
-					</TabsContent>
-				</Tabs>
+				<TableToolbarNoSSR />
+				<FiltersNoSSR />
+				<DataTable filterColumn={null} />
 			</TableContextProvider>
 		</div>
 	);

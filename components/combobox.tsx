@@ -53,7 +53,6 @@ const Combobox: React.FC<ComboboxProps> = ({
 								<CommandItem
 									key={item?.value}
 									value={item?.value}
-									onChange={(e) => {}}
 									onSelect={(currentValue) => {
 										onChange(currentValue);
 										setOpen(false);

@@ -9,15 +9,15 @@ import {
 } from "@/components/ui/resizable";
 import { SidebarNavItem } from "@/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SQLQuery } from "@/components/sql-editor";
+import { SQLEditor } from "@/components/sql-editor";
 import { useDatabase } from "@/lib/context/database-context";
 import { DataView } from "@/components/data-views";
 
 export default function Page() {
-	const { tables, commits } = useDatabase();
+	const { tables, commits, queries } = useDatabase();
 	return (
 		<ResizablePanelGroup direction="horizontal" className="min-h-[79vh]">
-			<ResizablePanel defaultSize={15} className="min-w-[10vw]">
+			<ResizablePanel defaultSize={15} className="min-w-fit">
 				<SidebarNav
 					type="table"
 					items={tables?.map((element: SidebarNavItem) => ({
@@ -31,17 +31,17 @@ export default function Page() {
 					<Tabs defaultValue="sql" className="h-full w-full">
 						<TabsList>
 							<TabsTrigger value="sql">SQL</TabsTrigger>
-							<TabsTrigger value="commits">Commits</TabsTrigger>
 							<TabsTrigger value="views">Views</TabsTrigger>
+							<TabsTrigger value="commits">Commits</TabsTrigger>
 						</TabsList>
 						<TabsContent value="sql">
-							<SQLQuery />
-						</TabsContent>
-						<TabsContent value="commits">
-							<Commits commits={commits} />
+							<SQLEditor />
 						</TabsContent>
 						<TabsContent value="views">
 							<DataView />
+						</TabsContent>
+						<TabsContent value="commits">
+							<Commits commits={commits} queries={queries} />
 						</TabsContent>
 					</Tabs>
 				</div>

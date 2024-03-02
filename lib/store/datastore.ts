@@ -103,7 +103,6 @@ const createStore: StateCreator<DataStoreState> = (set) => ({
 		set((state) => {
 			if (has(state.dataDiff, key) && has(state.dataDiff[key][operation], pk)) {
 				delete state.dataDiff[key][operation][pk]["newValue"][column];
-				delete state.dataDiff[key][operation][pk]["oldValue"];
 				if (isEmpty(state.dataDiff[key][operation][pk]["newValue"])) {
 					delete state.dataDiff[key][operation][pk];
 				}

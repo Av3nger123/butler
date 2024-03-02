@@ -55,13 +55,14 @@ export function DataView() {
 	return (
 		<div>
 			<div className="py-2 flex flex-row gap-2 items-center">
-				<SearchIcon className="w-6 h-6 stroke-background" />
-				<Input
-					value={search}
-					placeholder="Search..."
-					onChange={(e) => handleSearch(e.target.value)}
-					className="w-80"
-				/>
+				<div className="border rounded-lg px-2 flex flex-row gap-2 items-center">
+					<Input
+						value={search}
+						placeholder="Search..."
+						onChange={(e) => handleSearch(e.target.value)}
+						className="w-80 border-none focus-visible:ring-offset-0 focus-visible:ring-0  focus-visible:ring-offset-ring"
+					/>
+				</div>
 			</div>
 			<ScrollArea>
 				{filteredViews?.map((view: any) => (
@@ -70,9 +71,7 @@ export function DataView() {
 							<Asterisk className="w-8 h-8" />
 							{view?.title}
 						</label>
-						<div className="mt-2 rounded-xl">
-							<SQLQuery value={view?.query} />
-						</div>
+						<SQLQuery value={view?.query} className="mt-2 rounded-xl" />
 					</div>
 				))}
 			</ScrollArea>

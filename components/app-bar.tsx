@@ -88,9 +88,9 @@ export function AppBar() {
 	);
 	return (
 		<div className="w-full grid grid-cols-10 items-center justify-between gap-6 md:gap-10">
-			<div className="col-span-2 flex flex-row gap-2">
-				<Link href="/" className="hidden items-center space-x-2 md:flex">
-					<span className="hidden font-bold sm:inline-block">Butler</span>
+			<div className="col-span-2 flex flex-row gap-2 items-center">
+				<Link href="/" className="items-center space-x-2">
+					<span className="font-bold">Butler</span>
 				</Link>
 				<Combobox
 					items={workspaces ?? []}
@@ -106,8 +106,8 @@ export function AppBar() {
 					disabled={disable}
 				/>
 			</div>
-			<div className="col-span-6" />
-			<div className="flex gap-2 justify-end col-span-2 items-center">
+			<div className="col-span-5" />
+			<div className="flex gap-2 justify-end col-span-3 items-center">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Avatar>
@@ -131,7 +131,6 @@ export function AppBar() {
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
-				<Label>{session?.user?.name}</Label>
 				<ModeToggle />
 			</div>
 		</div>

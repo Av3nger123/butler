@@ -38,9 +38,10 @@ import {
 } from "@/components/ui/pagination";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
+import { SQLQuery } from "./sql-query";
 
 const SIZE = 100;
-export function SQLQuery() {
+export function SQLEditor() {
 	const [page, setPage] = useState(0);
 	const [isValid, setIsValid] = useState<boolean>(true);
 	const [editor, setEditor] = useState<any>();
@@ -192,35 +193,39 @@ export function SQLQuery() {
 	return (
 		<div className="flex-column flex rounded-sm border">
 			<ResizablePanelGroup direction="vertical" className="min-h-[70vh]">
-				<div className="bg-background m-2 flex h-[50px] flex-row items-center gap-2 rounded-xl border p-2">
-					<Button onClick={handleQueryRun} variant="secondary" size="sm">
+				<div className="bg-background m-2 flex h-[50px] flex-row items-center gap-1 p-2">
+					<Button onClick={handleQueryRun} variant="ghost" size="sm">
 						<Play className=" mr-2 h-4 w-4" />
 						Run
 					</Button>
 					<Dialog>
 						<DialogTrigger asChild>
-							<Button variant="secondary" size="sm">
+							<Button variant="ghost" size="sm">
 								<Save className=" mr-2 h-4 w-4" />
 								Save as View
 							</Button>
 						</DialogTrigger>
-						<DialogContent className="sm:max-w-[425px]">
+						<DialogContent className="max-w-[50vh]">
 							<DialogHeader>
 								<DialogTitle>Save as View</DialogTitle>
 								<DialogDescription>
 									Add a title to you View. Click save when you&apos;re done.
 								</DialogDescription>
 							</DialogHeader>
-							<div className="flex flex-col gap-2 ">
+							<div className="flex flex-col gap-2 w-full overflow-x-auto max-h-[80vh]">
 								<Label htmlFor="username" className="left">
 									View name
 								</Label>
 								<Input
+									className="ml-2 w-80"
 									id="title"
 									value={title}
 									placeholder="view"
 									onChange={(e) => setTitle(e.target.value)}
 								/>
+								<div className="max-h-96">
+									<SQLQuery value={input} className="h-full" />
+								</div>
 							</div>
 							<DialogFooter>
 								<Button onClick={handleSaveView} type="submit">
@@ -229,10 +234,9 @@ export function SQLQuery() {
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
-
 					<Dialog>
 						<DialogTrigger asChild>
-							<Button variant="secondary" size="sm">
+							<Button variant="ghost" size="sm">
 								<GitCommitVertical className=" mr-2 h-4 w-4" />
 								Commit Query
 							</Button>
@@ -245,13 +249,8 @@ export function SQLQuery() {
 									done.
 								</DialogDescription>
 							</DialogHeader>
-							<div className="grid gap-4 py-4">
-								<Textarea
-									id="name"
-									value={input}
-									className="col-span-3"
-									onChange={(e) => setInput(e.target.value)}
-								/>
+							<div className="max-h-96 w-full overflow-x-auto">
+								<SQLQuery value={input} className="h-full" />
 							</div>
 							<DialogFooter>
 								<Button type="submit">Save changes</Button>
@@ -260,7 +259,7 @@ export function SQLQuery() {
 					</Dialog>
 				</div>
 				<ResizablePanel defaultSize={80}>
-					<div className="bg-background mx-2 h-full overflow-y-auto rounded-xl border p-2">
+					<div className="bg-background mx-2 h-full overflow-y-auto">
 						{tables && (
 							<Editor
 								language="sql"

@@ -136,16 +136,6 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 		setRowSelection(finalState);
 	}, [pageIndex, pageSize]);
 
-	const { data: queryData } = useQuery({
-		queryKey: ["queries", clusterId, databaseId, tableId],
-		queryFn: async () => {
-			return await getApi(
-				`/api/clusters/${clusterId}/commits?databaseId=${databaseId}&tableId=${tableId}`
-			);
-		},
-		enabled: !!cluster,
-	});
-
 	const { data: schemaData } = useQuery({
 		queryKey: ["schema", clusterId, databaseId, tableId],
 		queryFn: async () => {
@@ -251,9 +241,7 @@ const TableContextProvider: React.FC<TableContextProviderProps> = ({
 	}, [clusterId, databaseId, tableId]);
 
 	useEffect(() => {
-		let queries = generateQueriesFromJSON(dataDiff[key], tableId, pk);
-		console.log(queries);
-		setQueries(queries);
+		setQueries(generateQueriesFromJSON(dataDiff[key], tableId, pk));
 	}, [dataDiff, key, pk, tableId]);
 
 	useEffect(() => {

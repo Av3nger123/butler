@@ -68,7 +68,15 @@ export function TableFilter({
 					type="Column"
 					items={schemaItems}
 					value={filters[path][index]["column"] ?? ""}
-					onChange={(val: any) => setColumn(path, index, val)}
+					onChange={(val: any) => {
+						setColumn(
+							path,
+							index,
+							Object.keys(schemas).filter(
+								(schema) => schema.toLowerCase() == val
+							)[0]
+						);
+					}}
 					disabled={false}
 				/>
 			</div>

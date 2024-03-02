@@ -23,23 +23,25 @@ model Cluster {
 }
 
 model Commit {
-    id         Int      @id @default(autoincrement())
+    id         Int       @id @default(autoincrement())
     title      String
-    createdAt  DateTime @default(now())
-    executedAt DateTime
+    createdAt  DateTime  @default(now())
+    executedAt DateTime?
+    isExecuted Boolean?  @default(false)
     clusterId  String
     databaseId String
-    queryIds   String[]
 
     @@map("commits")
 }
 
 model Query {
-    id         Int      @id @default(autoincrement())
-    query      String   @db.Text
+    id         Int       @id @default(autoincrement())
+    query      String    @db.Text
     tableId    String
-    createdAt  DateTime @default(now())
-    executedAt DateTime
+    commitId   Int
+    type       String
+    createdAt  DateTime  @default(now())
+    executedAt DateTime?
 
     @@map("queries")
 }

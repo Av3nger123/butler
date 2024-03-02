@@ -45,11 +45,11 @@ const Breadcrumbs: React.FC = () => {
 			className="border-rounded-xl flex flex-rowp-2 px-4 items-center"
 			aria-label="Breadcrumb"
 		>
-			<Button variant="ghost" className="mr-5">
+			<Link href={"/"} className="mr-5 flex flex-row items-center ">
 				<ChevronLeft className="mr-2 w-4 h-4" />
 				Back
-			</Button>
-			<Separator orientation="vertical" className="h-12" />
+			</Link>
+			<Separator orientation="vertical" className="h-12 mr-4" />
 			<ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
 				{pathSegments.map((segment, index) => {
 					return (

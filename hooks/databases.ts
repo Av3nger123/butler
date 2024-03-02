@@ -60,7 +60,7 @@ export const useGetCommits = (
 		queryFn: async () => {
 			if (cluster && database) {
 				return await getApi(
-					`/api/clusters/${cluster?.id}/commits?databaseId=${database}`
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/commits?clusterId=${cluster?.id}&databaseId=${database}`
 				);
 			}
 		},

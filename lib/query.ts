@@ -94,32 +94,36 @@ function generateUpdateQuery(
 	primaryKeyColumn: string
 ) {
 	const setClause = Object.entries(newValue)
-		.map(([column, value]) =>
-			typeof value == "string"
-				? `"${column}" = '${value}'`
-				: `"${column}" = ${value}`
+		.map(
+			([column, value]) =>
+				value != null &&
+				`"${column}" = ${JSON.stringify(value).replace(/"/g, "'")}`
 		)
 		.join(", ");
 	const conditions = primaryKeyColumn
 		.split("~")
-		.map((key) => `"${key}" = ${JSON.stringify(oldValue[key])}`);
+		.map(
+			(key) =>
+				key in oldValue &&
+				`"${key}" = ${
+					oldValue[key] == null
+						? "NULL"
+						: JSON.stringify(oldValue[key]).replace(/"/g, "'")
+				}`
+		);
 	return `UPDATE "${tableName}" SET ${setClause} WHERE ${conditions};`;
 }
 
 function generateInsertQuery(value: any, tableName: string) {
-	const columns = Object.keys(value).filter((val) => val != "primaryKey");
+	const columns = Object.keys(value).filter(
+		(val) => val != "primaryKey" && value[val] != null
+	);
 	const values = columns.map((key) => value[key]);
 	const placeholders = values
-		.map((val) =>
-			val == null
-				? "NULL"
-				: typeof val == "string"
-				? `'${val}'`
-				: JSON.stringify(val)
-		)
+		.map((val) => JSON.stringify(val).replace(/"/g, "'"))
 		.join(", ");
 	return `INSERT INTO "${tableName}" ("${columns.join(
-		'", "'
+		`", "`
 	)}") VALUES (${placeholders});`;
 }
 
@@ -131,7 +135,14 @@ function generateDeleteQuery(
 ) {
 	const conditions = primaryKeyColumn
 		.split("~")
-		.map((key: string) => `"${key}" = ${oldValue[key]}`);
+		.map(
+			(key: string) =>
+				`"${key}" = ${
+					oldValue[key] == null
+						? "NULL"
+						: JSON.stringify(oldValue[key]).replace(/"/g, "'")
+				}`
+		);
 	return `DELETE FROM "${tableName}" WHERE ${conditions};`;
 }
 
@@ -142,19 +153,23 @@ function generateRevertUpdateQuery(
 	tableName: string,
 	primaryKeyColumn: string
 ) {
-	const setClause = Object.entries(newValue).map(([column, value]) =>
-		typeof value == "string"
-			? `"${column}" = '${value}'`
-			: `"${column}" = ${JSON.stringify(value)}`
+	const setClause = Object.keys(newValue).map(
+		(column) =>
+			oldValue[column] != null &&
+			`${column} = ${JSON.stringify(oldValue[column]).replace(/"/g, "'")}`
 	);
 	const conditions = primaryKeyColumn
 		.split("~")
 		.map(
 			(key) =>
 				`"${key}" = ${
-					typeof oldValue[key] === "string"
-						? "'" + oldValue[key] + "'"
-						: JSON.stringify(oldValue[key])
+					key in newValue
+						? newValue[key] == null
+							? "NULL"
+							: JSON.stringify(newValue[key]).replace(/"/g, "'")
+						: oldValue[key] == null
+						? "NULL"
+						: JSON.stringify(oldValue[key]).replace(/"/g, "'")
 				}`
 		);
 	return `UPDATE "${tableName}" SET ${setClause} WHERE ${conditions};`;
@@ -170,23 +185,23 @@ function generateRevertInsertQuery(
 		.map(
 			(key: string) =>
 				`"${key}" = ${
-					typeof newValue[key] === "string"
-						? "'" + newValue[key] + "'"
-						: JSON.stringify(newValue[key])
+					newValue[key] == null
+						? "NULL"
+						: JSON.stringify(newValue[key]).replace(/"/g, "'")
 				}`
 		);
 	return `DELETE FROM "${tableName}" WHERE ${conditions};`;
 }
 
 function generateRevertDeleteQuery(value: any, tableName: string) {
-	const columns = Object.keys(value).filter((val) => val != "primaryKey");
+	const columns = Object.keys(value).filter(
+		(val) => val != "primaryKey" && value[val] != null
+	);
 	const values = columns.map((key) => value[key]);
 	const placeholders = values
-		.map((val) =>
-			val == null ? "NULL" : typeof val == "string" ? `'${val}'` : val
-		)
+		.map((val) => JSON.stringify(val).replace(/"/g, "'"))
 		.join(", ");
 	return `INSERT INTO "${tableName}" ("${columns.join(
-		'", "'
+		`", "`
 	)}") VALUES (${placeholders});`;
 }

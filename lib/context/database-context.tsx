@@ -9,14 +9,18 @@ import { usePathname } from "next/navigation";
 interface DatabaseContextType {
 	tables: any[];
 	commits: any[];
+	queries: any[];
 	views: any[];
+	commitRefetch: any;
 	database: string;
 }
 
 const initialDatabaseContext: DatabaseContextType = {
 	tables: [],
 	commits: [],
+	queries: [],
 	views: [],
+	commitRefetch: null,
 	database: "",
 };
 
@@ -49,7 +53,10 @@ const DatabaseContextProvider: React.FC<DatabaseContextProviderProps> = ({
 
 	const { data: DatabaseTables } = useGetTables(cluster, database);
 
-	const { data: DatabaseCommits } = useGetCommits(cluster, database);
+	const { data: DatabaseCommits, refetch: commitRefetch } = useGetCommits(
+		cluster,
+		database
+	);
 
 	const { data: DatabaseViews } = useGetViews(cluster, database);
 
@@ -57,13 +64,17 @@ const DatabaseContextProvider: React.FC<DatabaseContextProviderProps> = ({
 		return {
 			tables: DatabaseTables?.tables?.map((table: string) => ({ name: table })),
 			commits: DatabaseCommits?.commits,
+			queries: DatabaseCommits?.queries,
 			database: database,
+			commitRefetch,
 			views: DatabaseViews?.views,
 		};
 	}, [
 		DatabaseTables?.tables,
 		DatabaseCommits?.commits,
+		DatabaseCommits?.queries,
 		database,
+		commitRefetch,
 		DatabaseViews?.views,
 	]);
 	return (

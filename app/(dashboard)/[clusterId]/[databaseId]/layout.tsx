@@ -1,13 +1,7 @@
-import { DatabaseContextProvider } from "@/lib/context/database-context";
-
 export default function Layout({
-	children,
-	params,
+  children,
 }: Readonly<{
-	params: {
-		databaseId: string;
-	};
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	return <div>{children}</div>;
+  return <div>{children}</div>;
 }

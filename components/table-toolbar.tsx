@@ -2,13 +2,25 @@
 
 import {
 	ArrowUpFromLine,
+	Code,
 	Eye,
 	Filter,
+	GitCommit,
 	Play,
 	Plus,
+	RefreshCw,
 	Trash2,
 	X,
 } from "lucide-react";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "./ui/button";
 import useFilterStore from "@/lib/store/filterstore";
 import { has, isEmpty, uniqueId } from "lodash";
@@ -29,12 +41,24 @@ import {
 } from "./ui/tooltip";
 import { Separator } from "./ui/separator";
 import { SQLQuery } from "./sql-query";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { useState } from "react";
+import { postApi } from "@/lib/api";
+import { useCluster } from "@/lib/context/cluster-context";
+import { useWorkspace } from "@/lib/context/workspace-context";
+import { usePathname } from "next/navigation";
 
 const TableToolbar: React.FC = () => {
 	const { filters, addFilter, clear } = useFilterStore();
 	const [setDataDiffRow, clearDataDiff, deleteDataDiff] = useDataStore(
 		(state) => [state.setDataDiffRow, state.clearDataDiff, state.deleteDataDiff]
 	);
+
+	const pathname = usePathname();
+
+	const pathSegments = pathname.split("/").filter((segment) => segment !== "");
+	const [title, setTitle] = useState<string>("");
 	const {
 		key: path,
 		selectedIds,
@@ -45,41 +69,41 @@ const TableToolbar: React.FC = () => {
 		setPagination,
 	} = useTable();
 
+	const handleCommit = () => {
+		postApi(
+			`${process.env.NEXT_PUBLIC_SERVER_URL}/commits`,
+			JSON.stringify({
+				title,
+				clusterId: pathSegments[0],
+				databaseId: pathSegments[1],
+				queries: generatedQueries?.queries,
+				revertQueries: generatedQueries?.revertQueries,
+				createdAt: new Date(),
+			})
+		);
+	};
+
 	const queryClient = useQueryClient();
 	return (
 		<div className="flex items-center justify-center mb-1 h-10 gap-2 rounded-lg">
 			<TooltipProvider>
 				<Button
 					variant="secondary"
-					size={"icon"}
 					onClick={() => {
 						refetch();
 						queryClient.invalidateQueries({ queryKey: ["data"] });
 						setPagination((prev) => ({ ...prev, pageIndex: 0 }));
 					}}
 				>
-					<Tooltip>
-						<TooltipTrigger>
-							<Play className="h-4 w-4" />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Refetch</p>
-						</TooltipContent>
-					</Tooltip>
+					<RefreshCw className="mr-2 h-4 w-4" />
+					<p>Refetch</p>
 				</Button>
-				<Separator orientation="vertical" />
 
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button variant="secondary" size={"icon"}>
-							<Tooltip>
-								<TooltipTrigger>
-									<Eye className="h-4 w-4" />
-								</TooltipTrigger>
-								<TooltipContent>
-									<p>Queries</p>
-								</TooltipContent>
-							</Tooltip>
+						<Button variant="secondary">
+							<Code className="mr-2 h-4 w-4" />
+							<p>Queries</p>
 						</Button>
 					</PopoverTrigger>
 					<PopoverContent className="w-[100vh]">
@@ -90,42 +114,54 @@ const TableToolbar: React.FC = () => {
 								)}\n\n--- Revert queries ---\n${generatedQueries?.revertQueries?.join(
 									"\n\n"
 								)}`}
+								className="w-full"
 							/>
 						)}
 					</PopoverContent>
 				</Popover>
-				<Button variant="secondary" size={"icon"}>
-					<Tooltip>
-						<TooltipTrigger>
-							<ArrowUpFromLine className="h-4 w-4" />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Commit</p>
-						</TooltipContent>
-					</Tooltip>
-				</Button>
+
+				<Dialog>
+					<DialogTrigger asChild>
+						<Button variant="secondary" size="sm">
+							<GitCommit className=" mr-2 h-4 w-4" />
+							Commit Query
+						</Button>
+					</DialogTrigger>
+					<DialogContent className="sm:max-w-[425px]">
+						<DialogHeader>
+							<DialogTitle>Commit Query</DialogTitle>
+							<DialogDescription>Add a message to the commit</DialogDescription>
+						</DialogHeader>
+						<div className="flex flex-col gap-2">
+							<Input
+								className="ml-2 w-80"
+								id="title"
+								value={title}
+								placeholder="init changes"
+								onChange={(e) => setTitle(e.target.value)}
+							/>
+						</div>
+						<DialogFooter>
+							<Button onClick={handleCommit} type="submit">
+								Save changes
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+
 				<Button
 					variant="secondary"
-					size={"icon"}
 					onClick={() => {
 						clear(path);
 						clearDataDiff(path);
 					}}
 				>
-					<Tooltip>
-						<TooltipTrigger>
-							<X className="h-4 w-4" />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Clear</p>
-						</TooltipContent>
-					</Tooltip>
+					<X className="mr-2 h-4 w-4" />
+					<p>Clear</p>
 				</Button>
-				<Separator orientation="vertical" />
 
 				<Button
 					variant="secondary"
-					size={"icon"}
 					onClick={() => addFilter(path)}
 					disabled={
 						typeof window !== "undefined"
@@ -133,18 +169,11 @@ const TableToolbar: React.FC = () => {
 							: false
 					}
 				>
-					<Tooltip>
-						<TooltipTrigger>
-							<Filter className="h-4 w-4" />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Filter</p>
-						</TooltipContent>
-					</Tooltip>
+					<Filter className="mr-2 h-4 w-4" />
+					<p>Filter</p>
 				</Button>
 				<Button
 					variant="secondary"
-					size={"icon"}
 					onClick={() => {
 						let defaultRowVal = defaultRow(schemas);
 						let pk = uniqueId(`${createHashId(defaultRowVal)}_`);
@@ -154,18 +183,11 @@ const TableToolbar: React.FC = () => {
 						setDataDiffRow(path, "add", pk, defaultRowVal);
 					}}
 				>
-					<Tooltip>
-						<TooltipTrigger>
-							<Plus className="h-4 w-4" />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Add Row</p>
-						</TooltipContent>
-					</Tooltip>
+					<Plus className="mr-2 h-4 w-4" />
+					<p>Add Row</p>
 				</Button>
 				<Button
 					variant="secondary"
-					size={"icon"}
 					disabled={isEmpty(selectedIds)}
 					onClick={() => {
 						Object.keys(selectedIds).forEach((key) => {
@@ -173,14 +195,8 @@ const TableToolbar: React.FC = () => {
 						});
 					}}
 				>
-					<Tooltip>
-						<TooltipTrigger>
-							<Trash2 className="h-4 w-4" />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Delete Row</p>
-						</TooltipContent>
-					</Tooltip>
+					<Trash2 className="mr-2 h-4 w-4" />
+					<p>Delete Row</p>
 				</Button>
 			</TooltipProvider>
 		</div>
